@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-luckiest-guy), ui-sans-serif, system-ui, sans-serif;
+  --font-outfit: var(--font-luckiest-guy), ui-sans-serif, system-ui, sans-serif;
+  --font-nunito: var(--font-luckiest-guy), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer utilities {
+  .text-3d {
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.8), 4px 4px 0px rgba(0,0,0,0.2), 6px 6px 15px rgba(0,0,0,0.4);
+  }
+  .text-3d-sm {
+    text-shadow: 1px 1px 0 #000, 2px 2px 0 #fef08a, 3px 3px 0 #000;
+  }
+}

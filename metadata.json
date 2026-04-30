@@ -1,0 +1,5 @@
+{
+  "name": "Learn English Easy",
+  "description": "A comprehensive English to Bengali dictionary with pronunciation, spaced repetition, and voice search.",
+  "requestFramePermissions": ["microphone"]
+}
