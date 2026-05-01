@@ -8,6 +8,10 @@ import Image from 'next/image';
 import confetti from 'canvas-confetti';
 import { get, set } from 'idb-keyval';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, ReferenceLine } from 'recharts';
+import { UserProfile } from './UserProfile';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../lib/firebase';
+import { fetchSavedWordsFromFirestore, syncSavedWordsToFirestore, syncSessionToFirestore, fetchSessionFromFirestore } from '../lib/firestore-sync';
 
 // Initialize Gemini API
 const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
@@ -335,6 +339,7 @@ export default function DictionaryApp() {
   const [translationOutput, setTranslationOutput] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
   const [isTranslatingExamples, setIsTranslatingExamples] = useState(false);
+  const [isSavingSession, setIsSavingSession] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizState, setQuizState] = useState<'start' | 'playing' | 'finished'>('start');
   const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
@@ -422,6 +427,125 @@ export default function DictionaryApp() {
   const searchContainerRef = React.useRef<HTMLDivElement>(null);
   const topSearchContainerRef = React.useRef<HTMLDivElement>(null);
   const isTypingRef = React.useRef(false);
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimeoutRef = React.useRef<any>(null);
+
+  const [user] = useAuthState(auth);
+
+  const handleSaveSession = async () => {
+    if (!user) {
+      showToast("Please sign in to save your session.");
+      return;
+    }
+    
+    setIsSavingSession(true);
+    try {
+      const sessionData = {
+        quizState,
+        quizScore,
+        currentQuizIndex,
+        quizQuestions,
+        reviewMode,
+        reviewQueue,
+      };
+      await syncSessionToFirestore(user.uid, 'current', sessionData);
+      showToast("Session saved to your account!");
+    } catch (e) {
+      console.error(e);
+      showToast("Failed to save session.");
+    } finally {
+      setIsSavingSession(false);
+    }
+  };
+
+  const handleRestoreSession = async () => {
+    if (!user) {
+      showToast("Please sign in to restore your session.");
+      return;
+    }
+    
+    setIsSavingSession(true); // Reusing as loading state for session restoring
+    try {
+      const sessionData = await fetchSessionFromFirestore(user.uid, 'current');
+      if (sessionData) {
+        setQuizState(sessionData.quizState || 'start');
+        setQuizScore(sessionData.quizScore || 0);
+        setCurrentQuizIndex(sessionData.currentQuizIndex || 0);
+        setQuizQuestions(sessionData.quizQuestions || []);
+        
+        setReviewMode(sessionData.reviewMode || 'front');
+        setReviewQueue(sessionData.reviewQueue || []);
+        
+        if (sessionData.quizState && sessionData.quizState !== 'start') {
+          // Open Quiz View
+          setShowQuiz(true);
+          setShowDashboard(false);
+          setShowGlossary(false);
+          setShowHistory(false);
+          setResult(null);
+        } else if (sessionData.reviewQueue && sessionData.reviewQueue.length > 0) {
+          // Let review modal open if queue > 0
+          setShowDashboard(false);
+        }
+        
+        showToast("Session restored successfully!");
+      } else {
+        showToast("No saved session found.");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("Failed to restore session.");
+    } finally {
+      setIsSavingSession(false);
+    }
+  };
+
+  // Sync with Firestore when auth state changes
+  useEffect(() => {
+    if (user && isLoaded) {
+      const syncData = async () => {
+        const firestoreWords = await fetchSavedWordsFromFirestore(user.uid);
+        if (firestoreWords.length > 0) {
+          setSavedWords(prevWords => {
+            const merged = [...prevWords];
+            const existingWords = new Set(prevWords.map(w => w.word.toLowerCase()));
+            
+            firestoreWords.forEach(fw => {
+              if (!existingWords.has(fw.word.toLowerCase())) {
+                merged.push(fw);
+              }
+            });
+            return merged;
+          });
+        }
+      };
+      // Short delay to let local storage load first before merging
+      setTimeout(syncData, 500); 
+    }
+  }, [user, isLoaded]);
+
+  // Save words to idb-keyval and Firestore when updated
+  useEffect(() => {
+    if (!isLoaded) return;
+    const saveWords = async () => {
+      try {
+        await set('learnEnglishEasy_savedWords', savedWords);
+        if (user) {
+          await syncSavedWordsToFirestore(user.uid, savedWords);
+        }
+      } catch (e) {
+        console.error("Failed to save words to IndexedDB or Firestore", e);
+      }
+    };
+    saveWords();
+  }, [savedWords, isLoaded, user]);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setToastMessage(null), 3000);
+  };
 
   // Handle click outside to close suggestions
   useEffect(() => {
@@ -673,18 +797,7 @@ export default function DictionaryApp() {
     };
   }, [savedWords]);
 
-  // Save words to idb-keyval when updated
-  useEffect(() => {
-    if (!isLoaded) return;
-    const saveWords = async () => {
-      try {
-        await set('learnEnglishEasy_savedWords', savedWords);
-      } catch (e) {
-        console.error("Failed to save words to IndexedDB", e);
-      }
-    };
-    saveWords();
-  }, [savedWords, isLoaded]);
+
   
   // Save history to localStorage when updated
   useEffect(() => {
@@ -1731,6 +1844,7 @@ export default function DictionaryApp() {
     const isSaved = savedWords.some(w => w.word.toLowerCase() === targetWord.word.toLowerCase());
     if (isSaved) {
       setSavedWords(savedWords.filter(w => w.word.toLowerCase() !== targetWord.word.toLowerCase()));
+      showToast(`Removed "${targetWord.word}" from vocabulary.`);
     } else {
       const newSavedWord: SavedWord = {
         ...targetWord,
@@ -1742,6 +1856,7 @@ export default function DictionaryApp() {
         }
       };
       setSavedWords([newSavedWord, ...savedWords]);
+      showToast(`Added "${targetWord.word}" to vocabulary.`);
       
       // Update streak when learning/saving a new word
       const today = new Date().toDateString();
@@ -2482,17 +2597,27 @@ export default function DictionaryApp() {
             <h2 className={`text-2xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
               Reviewing <span className="text-[#10B981]">{reviewQueue.length + 1}</span> words
             </h2>
-            <button 
-              onClick={() => {
-                setReviewMode('none');
-                setCurrentReviewWord(null);
-                setReviewQueue([]);
-                setUserAudioUrl(null);
-              }}
-              className={`text-sm underline ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
-            >
-              Exit Review
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleSaveSession}
+                disabled={isSavingSession || !user}
+                className={`text-sm underline ${isDarkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'} ${!user ? 'opacity-50 cursor-not-allowed no-underline hidden' : ''}`}
+                title={!user ? 'Sign in to save session' : 'Save Session'}
+              >
+                Save
+              </button>
+              <button 
+                onClick={() => {
+                  setReviewMode('none');
+                  setCurrentReviewWord(null);
+                  setReviewQueue([]);
+                  setUserAudioUrl(null);
+                }}
+                className={`text-sm underline ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+              >
+                Exit Review
+              </button>
+            </div>
           </div>
 
           <div className={`w-full rounded-[2.5rem] shadow-sm border p-8 md:p-12 text-center flex flex-col items-center min-h-[400px] justify-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
@@ -2627,9 +2752,10 @@ export default function DictionaryApp() {
                     {currentReviewWord.word}
                   </h3>
                   
-                  <p className={`font-mono text-xl mb-8 ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
-                    {currentReviewWord.phonetic}
-                  </p>
+                  <div className={`inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-xl shadow-inner border ${isDarkMode ? 'bg-[#212f45]/50 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
+                    <Volume2 className="w-5 h-5 opacity-70" />
+                    <span className="font-mono text-xl font-medium tracking-wider">{currentReviewWord.phonetic}</span>
+                  </div>
 
                   <div className="w-full max-w-sm flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
@@ -2778,6 +2904,26 @@ export default function DictionaryApp() {
               Progress <span className="text-[#10B981]">Dashboard</span>
             </h2>
             <div className="flex items-center gap-3">
+              <button
+                onClick={handleSaveSession}
+                disabled={isSavingSession || !user}
+                className={`p-2 rounded-full border transition-colors ${
+                  !user ? 'opacity-50 cursor-not-allowed' : ''
+                } ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+                title={!user ? 'Sign in to save session' : 'Save Session'}
+              >
+                <Bookmark className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleRestoreSession}
+                disabled={isSavingSession || !user}
+                className={`p-2 rounded-full border transition-colors ${
+                  !user ? 'opacity-50 cursor-not-allowed' : ''
+                } ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+                title={!user ? 'Sign in to restore session' : 'Restore Session'}
+              >
+                <History className="w-5 h-5" />
+              </button>
               <button 
                 onClick={() => setShowSrsSettings(true)}
                 className={`p-2 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
@@ -3444,15 +3590,26 @@ export default function DictionaryApp() {
               Vocabulary <span className="text-emerald-500">Quiz</span> 
               <Gamepad2 className="w-8 h-8 text-emerald-500" />
             </h2>
-            <button
-              onClick={() => {
-                setShowQuizSettings(true);
-              }}
-              className={`p-2 rounded-full border transition-colors flex items-center gap-2 px-4 shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-slate-600 hover:bg-gray-50 hover:text-slate-900'}`}
-            >
-              <Settings className="w-4 h-4" />
-              <span className="text-sm font-bold hidden sm:inline">Quiz Settings</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSaveSession}
+                disabled={isSavingSession || !user}
+                className={`p-2 rounded-full border transition-colors flex items-center gap-2 px-3 shadow-sm ${!user ? 'opacity-50 cursor-not-allowed hidden sm:flex' : ''} ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-slate-600 hover:bg-gray-50 hover:text-slate-900'}`}
+                title={!user ? 'Sign in to save session' : 'Save Session'}
+              >
+                <Bookmark className="w-4 h-4" />
+                <span className="text-sm font-bold hidden md:inline">Save Session</span>
+              </button>
+              <button
+                onClick={() => {
+                  setShowQuizSettings(true);
+                }}
+                className={`p-2 rounded-full border transition-colors flex items-center gap-2 px-4 shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-slate-600 hover:bg-gray-50 hover:text-slate-900'}`}
+              >
+                <Settings className="w-4 h-4" />
+                <span className="text-sm font-bold hidden sm:inline">Quiz Settings</span>
+              </button>
+            </div>
           </div>
 
           <div className={`rounded-[2.5rem] shadow-sm border p-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
@@ -4234,8 +4391,11 @@ export default function DictionaryApp() {
                   </div>
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-5xl font-outfit font-extrabold text-[#10B981] mb-2 text-3d-sm">{result.word}</h3>
-                      <p className={`font-mono text-base mb-6 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>{result.phonetic}</p>
+                      <h3 className="text-5xl font-outfit font-extrabold text-[#10B981] mb-4 text-3d-sm">{result.word}</h3>
+                      <div className={`inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-[#1e293b] border-slate-700 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-600'}`}>
+                        <Volume2 className="w-4 h-4 opacity-70" />
+                        <span className="font-mono text-base font-medium tracking-wide">{result.phonetic}</span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -5406,6 +5566,21 @@ export default function DictionaryApp() {
                 Got it
               </button>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl z-[100] font-medium flex items-center gap-3 backdrop-blur-md ${isDarkMode ? 'bg-emerald-900/90 text-emerald-100 border border-emerald-500/30' : 'bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-emerald-500/20'}`}
+          >
+            <CheckCircle className="w-5 h-5 flex-shrink-0" />
+            <span className="truncate max-w-[200px] sm:max-w-xs">{toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>

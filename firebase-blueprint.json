@@ -1,0 +1,46 @@
+{
+  "entities": {
+    "SavedWord": {
+      "title": "SavedWord",
+      "description": "A saved word from the dictionary.",
+      "type": "object",
+      "properties": {
+        "wordData": {
+          "type": "string",
+          "description": "JSON string of the saved word data."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Server timestamp of creation or update."
+        }
+      },
+      "required": ["wordData"]
+    },
+    "LearningSession": {
+      "title": "LearningSession",
+      "description": "A saved learning session.",
+      "type": "object",
+      "properties": {
+        "sessionData": {
+          "type": "string",
+          "description": "JSON string of the session data."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Server timestamp of creation or update."
+        }
+      },
+      "required": ["sessionData"]
+    }
+  },
+  "firestore": {
+    "users/{userId}/savedWords/{wordId}": {
+      "schema": { "$ref": "SavedWord" },
+      "description": "A user's saved vocabulary."
+    },
+    "users/{userId}/sessions/{sessionId}": {
+      "schema": { "$ref": "LearningSession" },
+      "description": "A user's saved learning sessions."
+    }
+  }
+}
