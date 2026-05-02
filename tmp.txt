@@ -1,0 +1,2311 @@
+2-
+3-import React, { useState, useEffect } from 'react';
+4:import { Search, Volume2, Bookmark, Menu, Sun, Moon, RefreshCw, Quote, ArrowRight, Lightbulb, History, Trash2, Leaf, TrendingUp, Settings, X, ThumbsUp, ThumbsDown, Flag, CheckCircle, Mic, Download, WifiOff, Brain, Play, Video, Info, Languages, Book, BookOpen, Link, Gamepad2, Tag, Copy, Check, Loader2, ImageIcon, MessageCircle, Share2, AlertTriangle, Calendar, FileText } from 'lucide-react';
+5-import { motion, AnimatePresence } from 'motion/react';
+6-import { GoogleGenAI, Type, Modality } from "@google/genai";
+--
+75-};
+76-
+77:const highlightWord = (text: string, targetWord: string, isDarkMode: boolean) => {
+78-  if (!targetWord || !text) return <>{text}</>;
+79-  
+--
+84-      {parts.map((part, i) => 
+85-        i % 2 === 1 ? 
+86:          <span key={i} className={`font-bold px-1 rounded ${isDarkMode ? 'text-emerald-300 bg-emerald-900/40' : 'text-emerald-700 bg-emerald-200/50'}`}>{part}</span> : 
+87-          part
+88-      )}
+--
+149-  colorClass: string;
+150-  bgClass: string;
+151:  darkColorClass: string;
+152:  darkBgClass: string;
+153-}
+154-
+--
+169-    colorClass: "text-[#10B981]",
+170-    bgClass: "bg-[#F0FDF8]",
+171:    darkColorClass: "text-emerald-500",
+172:    darkBgClass: "bg-emerald-950/30"
+173-  },
+174-  voice: {
+--
+187-    colorClass: "text-orange-500",
+188-    bgClass: "bg-orange-50",
+189:    darkColorClass: "text-orange-500",
+190:    darkBgClass: "bg-orange-950/30"
+191-  },
+192-  tips: {
+--
+195-    whatItDoes: [
+196-      "📝 Generates personalized speaking advice for each word.",
+197:      "🔍 Highlights tricky syllables, stress points, and silent letters."
+198-    ],
+199-    whyYouNeedIt: [
+--
+202-      "😎 Boost Confidence: Removes the fear of mispronouncing words."
+203-    ],
+204:    icon: <Lightbulb className="w-6 h-6" />,
+205-    colorClass: "text-yellow-600",
+206-    bgClass: "bg-yellow-50",
+207:    darkColorClass: "text-yellow-500",
+208:    darkBgClass: "bg-yellow-950/30"
+209-  },
+210-  save: {
+--
+223-    colorClass: "text-pink-500",
+224-    bgClass: "bg-pink-50",
+225:    darkColorClass: "text-pink-500",
+226:    darkBgClass: "bg-pink-950/30"
+227-  },
+228-  examples: {
+--
+241-    colorClass: "text-sky-500",
+242-    bgClass: "bg-sky-50",
+243:    darkColorClass: "text-sky-500",
+244:    darkBgClass: "bg-sky-950/30"
+245-  }
+246-};
+--
+249-
+250-// Helper components
+251:const CopyButton = ({ text, isDarkMode }: { text: string; isDarkMode: boolean }) => {
+252-  const [copied, setCopied] = React.useState(false);
+253-
+--
+266-    <button 
+267-      onClick={handleCopy}
+268:      className={`p-1.5 rounded-lg transition-all shrink-0 ${isDarkMode ? 'hover:bg-white/10 text-gray-400 hover:text-emerald-400' : 'hover:bg-gray-100 text-slate-400 hover:text-emerald-600'}`}
+269-      title={copied ? "Copied!" : "Copy to clipboard"}
+270-    >
+--
+443-  const [isSpeaking, setIsSpeaking] = useState(false);
+444-  const [showBengali, setShowBengali] = useState(false);
+445:  const [isDarkMode, setIsDarkMode] = useState(() => {
+446-    if (typeof window !== 'undefined') {
+447:      return localStorage.getItem('learnEnglishEasy_theme') === 'dark';
+448-    }
+449-    return false;
+--
+765-  // Save theme to localStorage and update document.documentElement when updated
+766-  useEffect(() => {
+767:    localStorage.setItem('learnEnglishEasy_theme', isDarkMode ? 'dark' : 'light');
+768:    if (isDarkMode) {
+769:      document.documentElement.classList.add('dark');
+770-    } else {
+771:      document.documentElement.classList.remove('dark');
+772-    }
+773:  }, [isDarkMode]);
+774-
+775-  // Save stats to localStorage when updated
+--
+2311-
+2312-  return (
+2313:    <div className={`min-h-screen flex flex-col w-full overflow-x-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#0a0a0a] text-gray-100' : 'bg-gradient-to-b from-[#E6F7F2] via-[#F0FDF8] to-[#F8FAFC] text-slate-800'}`}>
+2314-      {/* Navbar */}
+2315-      <nav className="flex items-center justify-between p-4 md:px-8 md:py-6 max-w-5xl mx-auto w-full relative z-50">
+--
+2319-          className="flex items-center gap-2 sm:gap-3 cursor-pointer transition-transform hover:scale-105 shrink-0"
+2320-        >
+2321:          <Leaf className={`w-8 h-8 sm:w-10 sm:h-10 ${isDarkMode ? 'text-[#10B981]' : 'text-[#064E3B]'}`} />
+2322-        </div>
+2323-
+--
+2325-        <div className="hidden md:flex flex-wrap items-center justify-end gap-1 sm:gap-4">
+2326-          <button 
+2327:            onClick={() => setIsDarkMode(!isDarkMode)}
+2328:            className={`relative w-16 h-8 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-500 overflow-hidden ${isDarkMode ? 'bg-slate-700' : 'bg-sky-100 border border-sky-200/50'}`}
+2329:            aria-label="Toggle dark mode"
+2330-          >
+2331-            {/* Track background icons */}
+2332-            <div className="absolute inset-0 flex items-center justify-between px-1.5 pointer-events-none">
+2333:              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`}>
+2334-                <Moon className="w-4 h-4 text-emerald-400" />
+2335-              </span>
+2336:              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`}>
+2337-                <Sun className="w-4 h-4 text-amber-500" />
+2338-              </span>
+--
+2340-            
+2341-            {/* Sliding thumb */}
+2342:            <div className={`relative w-6 h-6 rounded-full shadow-sm flex items-center justify-center transition-all duration-500 z-10 ${isDarkMode ? 'translate-x-8 bg-slate-800 border border-slate-600' : 'translate-x-0 bg-white border border-slate-100'}`}>
+2343:              <Moon className={`absolute w-3.5 h-3.5 text-emerald-400 transition-all duration-500 ${isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} />
+2344:              <Sun className={`absolute w-3.5 h-3.5 text-amber-500 transition-all duration-500 ${isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} />
+2345-            </div>
+2346-          </button>
+--
+2358-              }
+2359-            }}
+2360:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2361-            title="Vocabulary Quiz - Test your saved words"
+2362-          >
+--
+2375-              }
+2376-            }}
+2377:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2378-            title="AI Translator - Translate text and sentences"
+2379-          >
+--
+2392-              }
+2393-            }}
+2394:            className={`relative p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2395-            title="Progress Dashboard - View your learning stats"
+2396-          >
+2397-            <TrendingUp className="w-6 h-6" />
+2398-            {dueWordsCount > 0 && (
+2399:              <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-[#0a0a0a]"></span>
+2400-            )}
+2401-          </button>
+--
+2412-              }
+2413-            }}
+2414:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2415-            title="Glossary - Browse all your saved words"
+2416-          >
+--
+2421-              setShowSrsSettings(true);
+2422-            }}
+2423:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2424-            title="Settings - Configure app preferences"
+2425-          >
+--
+2438-              }
+2439-            }}
+2440:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2441-            title="Search History - View recent words"
+2442-          >
+--
+2448-        <div className="flex md:hidden items-center gap-2">
+2449-          <button 
+2450:            onClick={() => setIsDarkMode(!isDarkMode)}
+2451:            className={`relative w-14 h-7 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-500 overflow-hidden ${isDarkMode ? 'bg-slate-700' : 'bg-sky-100 border border-sky-200/50'}`}
+2452:            aria-label="Toggle dark mode"
+2453-          >
+2454-            {/* Track background icons */}
+2455-            <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
+2456:              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`}>
+2457-                <Moon className="w-3.5 h-3.5 text-emerald-400" />
+2458-              </span>
+2459:              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`}>
+2460-                <Sun className="w-3.5 h-3.5 text-amber-500" />
+2461-              </span>
+--
+2463-            
+2464-            {/* Sliding thumb */}
+2465:            <div className={`relative w-5 h-5 rounded-full shadow-sm flex items-center justify-center transition-all duration-500 z-10 ${isDarkMode ? 'translate-x-7 bg-slate-800 border border-slate-600' : 'translate-x-0 bg-white border border-slate-100'}`}>
+2466:              <Moon className={`absolute w-3 h-3 text-emerald-400 transition-all duration-500 ${isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} />
+2467:              <Sun className={`absolute w-3 h-3 text-amber-500 transition-all duration-500 ${isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} />
+2468-            </div>
+2469-          </button>
+2470-          <button 
+2471-            onClick={() => setShowMobileMenu(!showMobileMenu)}
+2472:            className={`p-2 rounded-xl transition-colors ${isDarkMode ? 'bg-white/5 text-gray-200 hover:bg-white/10' : 'bg-white shadow-sm text-slate-800 hover:bg-gray-50'}`}
+2473-          >
+2474-            {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+--
+2484-            animate={{ opacity: 1, height: 'auto' }}
+2485-            exit={{ opacity: 0, height: 0 }}
+2486:            className={`md:hidden absolute top-[72px] left-4 right-4 z-40 rounded-2xl p-4 shadow-xl border overflow-hidden flex flex-col gap-2 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+2487-          >
+2488-            <button 
+--
+2500-                }
+2501-              }}
+2502:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2503-            >
+2504-              <Gamepad2 className="w-5 h-5 text-emerald-500" />
+--
+2518-                }
+2519-              }}
+2520:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2521-            >
+2522-              <CustomTranslateIcon className="w-5 h-5 text-emerald-500" />
+--
+2536-                }
+2537-              }}
+2538:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2539-            >
+2540-              <div className="relative">
+2541-                <TrendingUp className="w-5 h-5 text-emerald-500" />
+2542-                {dueWordsCount > 0 && (
+2543:                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#0a0a0a]"></span>
+2544-                )}
+2545-              </div>
+--
+2559-                }
+2560-              }}
+2561:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2562-            >
+2563-              <BookOpen className="w-5 h-5 text-emerald-500" />
+--
+2569-                setShowSrsSettings(true);
+2570-              }}
+2571:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2572-            >
+2573-              <Settings className="w-5 h-5 text-emerald-500" />
+--
+2587-                }
+2588-              }}
+2589:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2590-            >
+2591-              <History className="w-5 h-5 text-emerald-500" />
+--
+2619-            className={`w-full max-w-5xl mx-auto mt-4 px-4 relative z-40`}
+2620-          >
+2621:            <div className={`p-4 rounded-xl flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm border-l-4 ${isDarkMode ? 'bg-slate-800/80 border-[#10B981]' : 'bg-white border-[#10B981]'} `}>
+2622-              <div className="flex items-center gap-4 text-left w-full sm:w-auto">
+2623:                <div className={`p-3 rounded-full shrink-0 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-600'}`}>
+2624-                  <Calendar className="w-6 h-6" />
+2625-                </div>
+2626-                <div>
+2627:                  <h3 className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Time for your daily review!</h3>
+2628:                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-600'}`}>
+2629-                    {userStats.dailyReminders === undefined 
+2630-                      ? "You have words due. Enable daily reminders to build your learning streak?"
+--
+2655-                         setShowStudyReminder(false);
+2656-                      }}
+2657:                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+2658-                    >
+2659-                      No Thanks
+--
+2679-                         setShowStudyReminder(false);
+2680-                      }}
+2681:                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+2682-                    >
+2683-                      Dismiss
+--
+2694-        <div className="w-full max-w-2xl mx-auto px-4 py-8 flex-1 flex flex-col items-center justify-center">
+2695-          <div className="w-full flex justify-between items-center mb-8">
+2696:            <h2 className={`text-2xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+2697-              Reviewing <span className="text-[#10B981]">{reviewQueue.length + 1}</span> words
+2698-            </h2>
+--
+2704-                setUserAudioUrl(null);
+2705-              }}
+2706:              className={`text-sm underline ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+2707-            >
+2708-              Exit Review
+--
+2710-          </div>
+2711-
+2712:          <div className={`w-full rounded-[2.5rem] shadow-sm border p-8 md:p-12 text-center flex flex-col items-center min-h-[400px] justify-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+2713-            <div className="flex items-center justify-center gap-4 mb-4">
+2714:              <h3 className={`text-5xl md:text-6xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-[#10B981]' : 'text-[#10B981]'}`}>
+2715-                {currentReviewWord.word}
+2716-              </h3>
+--
+2722-                  <button 
+2723-                    onClick={isRecording ? stopRecording : startRecording}
+2724:                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${isRecording ? 'bg-red-500 text-white border-red-500 animate-pulse' : isDarkMode ? 'bg-white/5 border-white/10 text-red-400 hover:bg-white/10' : 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'}`}
+2725-                    title={isRecording ? "Stop recording" : "Record your pronunciation"}
+2726-                  >
+--
+2729-                  <button 
+2730-                    onClick={() => playPronunciation(currentReviewWord.word)}
+2731:                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${isSpeaking ? 'bg-[#10B981] text-white border-[#10B981]' : isDarkMode ? 'bg-white/5 border-white/10 text-emerald-400 hover:bg-white/10' : 'bg-[#F0FDF8] border-[#BDE8DB] text-[#10B981] hover:bg-[#E6F5F1]'}`}
+2732-                    title="Play pronunciation"
+2733-                  >
+--
+2739-
+2740-            {userAudioUrl && (
+2741:              <div className={`w-full max-w-md mx-auto mb-6 p-4 rounded-2xl border ${isDarkMode ? 'bg-indigo-950/20 border-indigo-500/20' : 'bg-indigo-50/50 border-indigo-100'}`}>
+2742-                <div className="flex items-center justify-between mb-3">
+2743:                  <h4 className={`text-sm font-bold flex items-center gap-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+2744-                    <Mic className="w-4 h-4" /> Compare Pronunciation
+2745-                  </h4>
+2746-                  <button 
+2747-                    onClick={isRecording ? stopRecording : startRecording}
+2748:                    className={`text-xs font-medium px-2 py-1 rounded-lg transition-colors ${isRecording ? 'bg-red-500 text-white animate-pulse' : isDarkMode ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-white text-slate-600 hover:bg-gray-100 border border-gray-200'}`}
+2749-                  >
+2750-                    {isRecording ? "Stop" : "Record Again"}
+--
+2752-                </div>
+2753-                <div className="flex items-center gap-3">
+2754:                  <div className={`flex-1 flex items-center justify-between p-3 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+2755:                    <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>You</span>
+2756:                    <button onClick={playRecording} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'bg-sky-900/30 text-sky-400 hover:bg-sky-900/50' : 'bg-sky-50 text-sky-600 hover:bg-sky-100'}`}>
+2757-                      <Play className="w-4 h-4" />
+2758-                    </button>
+2759-                  </div>
+2760-                  
+2761:                  <div className={`text-xs font-bold uppercase ${isDarkMode ? 'text-gray-600' : 'text-slate-400'}`}>
+2762-                    VS
+2763-                  </div>
+2764-                  
+2765:                  <div className={`flex-1 flex items-center justify-between p-3 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+2766:                    <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>AI</span>
+2767:                    <button onClick={() => playPronunciation(currentReviewWord.word)} className={`p-2 rounded-lg transition-colors ${isSpeaking ? 'bg-[#10B981] text-white' : isDarkMode ? 'bg-emerald-900/30 text-emerald-400 hover:bg-emerald-900/50' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
+2768-                      <Volume2 className="w-4 h-4" />
+2769-                    </button>
+--
+2774-                  <div className="mt-4 flex items-center justify-center py-4 bg-indigo-500/10 rounded-xl">
+2775-                    <Loader2 className="w-5 h-5 animate-spin text-indigo-500 mr-2" />
+2776:                    <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">AI is analyzing your pronunciation...</span>
+2777-                  </div>
+2778-                )}
+2779-                {!isAnalyzingAudio && pronunciationScore && (
+2780:                  <div className={`mt-5 p-6 rounded-2xl border ${pronunciationScore.isCorrect ? (isDarkMode ? 'bg-emerald-950/40 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200') : (isDarkMode ? 'bg-amber-950/40 border-amber-500/30' : 'bg-amber-50 border-amber-200')} shadow-sm relative overflow-hidden text-left`}>
+2781-                    <div className={`absolute top-0 left-0 w-1 h-full ${pronunciationScore.isCorrect ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
+2782-                    
+--
+2784-                      <div className="flex items-center justify-between">
+2785-                        <div className="flex items-center gap-3">
+2786:                          <div className={`p-2 rounded-xl ${pronunciationScore.isCorrect ? (isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-200 text-emerald-700') : (isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-200 text-amber-700')}`}>
+2787-                            {pronunciationScore.isCorrect ? <CheckCircle className="w-6 h-6" /> : <Info className="w-6 h-6" />}
+2788-                          </div>
+2789:                          <h4 className={`text-lg md:text-xl font-bold font-outfit ${pronunciationScore.isCorrect ? (isDarkMode ? 'text-emerald-400' : 'text-emerald-700') : (isDarkMode ? 'text-amber-400' : 'text-amber-700')}`}>
+2790-                            {pronunciationScore.isCorrect ? "Great Job!" : "Keep Trying!"}
+2791-                          </h4>
+--
+2793-                        
+2794-                        <div className="flex items-baseline gap-1">
+2795:                          <span className={`text-3xl font-black font-outfit ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+2796-                            {pronunciationScore.score}
+2797-                          </span>
+2798:                          <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>%</span>
+2799-                        </div>
+2800-                      </div>
+2801-
+2802:                      <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDarkMode ? 'bg-black/40' : 'bg-white/60'} shadow-inner`}>
+2803-                        <motion.div 
+2804-                          initial={{ width: 0 }}
+--
+2811-                      </div>
+2812-
+2813:                      <div className={`p-4 rounded-xl mt-1 flex flex-col gap-3 ${isDarkMode ? 'bg-white/5' : 'bg-white/60'} backdrop-blur-sm`}>
+2814-                        {pronunciationScore.phoneticTranscription && (
+2815-                          <div className="flex items-center gap-2">
+2816-                            <span className="text-xs font-bold uppercase tracking-wider text-emerald-500">You said:</span>
+2817:                            <span className={`font-mono text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>/{pronunciationScore.phoneticTranscription}/</span>
+2818-                          </div>
+2819-                        )}
+2820:                        <p className={`text-sm md:text-base font-medium leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>
+2821-                          {pronunciationScore.feedback}
+2822-                        </p>
+2823-                        {pronunciationScore.specificTips && pronunciationScore.specificTips.length > 0 && (
+2824-                          <div className="mt-2 text-sm">
+2825:                            <span className={`font-bold mb-2 block ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Improvement Tips:</span>
+2826-                            <ul className="list-disc pl-5 space-y-1">
+2827-                              {pronunciationScore.specificTips.map((tip: string, idx: number) => (
+2828:                                <li key={idx} className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>{tip}</li>
+2829-                              ))}
+2830-                            </ul>
+--
+2849-                {/* Front (English Word) */}
+2850-                <div 
+2851:                  className={`absolute w-full h-full rounded-[3rem] shadow-lg border flex flex-col items-center justify-center p-8 bg-gradient-to-br transition-shadow ${isDarkMode ? 'from-[#1A1A1A] to-[#111] border-white/10' : 'from-white to-emerald-50/50 border-emerald-100'}`}
+2852-                  style={{ backfaceVisibility: 'hidden' }}
+2853-                >
+2854:                  <p className={`text-sm font-bold uppercase tracking-widest mb-8 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>Review Mode</p>
+2855-                  
+2856:                  <h3 className={`text-5xl md:text-6xl font-black font-outfit mb-4 text-center ${isDarkMode ? 'text-white text-3d-sm' : 'text-slate-800 text-3d-sm'}`}>
+2857-                    {currentReviewWord.word}
+2858-                  </h3>
+2859-                  
+2860:                  <div className={`inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-xl shadow-inner border ${isDarkMode ? 'bg-[#212f45]/50 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
+2861-                    <Volume2 className="w-5 h-5 opacity-70" />
+2862-                    <span className="font-mono text-xl font-medium tracking-wider">{currentReviewWord.phonetic}</span>
+--
+2865-                  <div className="w-full max-w-sm flex flex-col gap-4">
+2866-                    <div className="flex flex-col gap-2">
+2867:                      <label className={`text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Recall Meaning</label>
+2868-                      <input
+2869-                        type="text"
+--
+2871-                        onChange={(e) => setReviewGuess(e.target.value)}
+2872-                        placeholder="Type meaning..."
+2873:                        className={`w-full px-4 py-3 rounded-xl border outline-none transition-colors ${isDarkMode ? 'bg-white/5 border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-800 focus:border-[#10B981]'}`}
+2874-                        onKeyDown={(e) => {
+2875-                          if (e.key === 'Enter' && reviewMode === 'front') {
+--
+2891-                {/* Back (Meanings) */}
+2892-                <div 
+2893:                  className={`absolute w-full h-full rounded-[3rem] shadow-lg border flex flex-col p-6 md:p-8 overflow-y-auto overflow-x-hidden ${isDarkMode ? 'bg-gradient-to-br from-[#1A1A1A] to-[#111] border-white/10' : 'bg-gradient-to-br from-[#F8FAFC] to-white border-emerald-100'}`}
+2894-                  style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+2895-                >
+2896-                  <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6">
+2897:                    <div className={`p-5 rounded-2xl border text-center ${isDarkMode ? 'bg-red-500/10 border-red-500/20' : 'bg-red-50 border-red-100'}`}>
+2898:                      <h4 className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>Bengali Meaning</h4>
+2899:                      <p className={`text-3xl font-bold font-outfit ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>{currentReviewWord.bengaliMeaning}</p>
+2900-                    </div>
+2901-
+2902:                    <div className={`p-5 rounded-2xl border text-left ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20' : 'bg-blue-50 border-blue-100'}`}>
+2903:                      <h4 className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>English Meaning</h4>
+2904:                      <p className={`text-lg font-medium leading-relaxed ${isDarkMode ? 'text-blue-100' : 'text-blue-900'}`}>{currentReviewWord.englishDefinition}</p>
+2905-                    </div>
+2906-                    
+2907-                    {currentReviewWord.examples && currentReviewWord.examples.length > 0 && (
+2908-                      <div className="px-2">
+2909:                        <h4 className={`text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-1 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+2910-                          <Quote className="w-3 h-3" /> Examples
+2911-                        </h4>
+--
+2913-                          {currentReviewWord.examples.slice(0, 2).map((ex, idx) => (
+2914-                            <div key={idx} className="flex gap-2">
+2915:                              <span className={`font-bold text-xs mt-1 shrink-0 ${isDarkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>{idx + 1}.</span>
+2916-                              <div className="flex flex-col gap-1 w-full">
+2917:                                <p className={`text-sm italic ${isDarkMode ? 'text-emerald-100' : 'text-emerald-900'}`}>
+2918:                                  &quot;{highlightWord(ex.english, currentReviewWord.word, isDarkMode)}&quot;
+2919-                                </p>
+2920-                              </div>
+--
+2935-                className="w-full max-w-2xl mx-auto mt-8 relative z-10"
+2936-              >
+2937:                <p className={`text-sm font-bold text-center mb-4 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>How well did you know this?</p>
+2938-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+2939-                  <button onClick={() => handleReview('Again')} className="py-4 rounded-2xl font-bold bg-red-100/80 text-red-700 hover:bg-red-200 hover:-translate-y-1 transition-all active:translate-y-0">Again</button>
+--
+2949-        <div className="w-full max-w-3xl mx-auto px-4 py-8 flex-1">
+2950-          <div className="flex items-center justify-between mb-8">
+2951:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+2952-              AI <span className="text-[#10B981]">Translator</span>
+2953-            </h2>
+2954:            <div className={`p-2 rounded-full border ${isDarkMode ? 'border-white/10 bg-white/5 text-emerald-400' : 'border-emerald-100 bg-emerald-50 text-emerald-600'}`}>
+2955-              <CustomTranslateIcon className="w-5 h-5" />
+2956-            </div>
+--
+2958-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+2959-            {/* Input Side */}
+2960:            <div className={`p-6 rounded-[2rem] border flex flex-col ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+2961-              <div className="flex justify-between items-center mb-4">
+2962:                <span className={`text-sm font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Input</span>
+2963-                <button 
+2964-                  onClick={() => { setTranslationInput(''); setTranslationOutput(''); }}
+2965:                  className={`text-xs px-3 py-1 rounded-full transition-colors ${isDarkMode ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+2966-                >
+2967-                  Clear
+--
+2972-                onChange={(e) => setTranslationInput(e.target.value)}
+2973-                placeholder="Type English or Bengali text here to instantly translate..."
+2974:                className={`w-full flex-1 min-h-[150px] p-4 rounded-xl border text-base focus:ring-2 focus:ring-[#10B981] outline-none resize-none transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-white placeholder-gray-600' : 'bg-gray-50 border-gray-200 text-slate-800 placeholder-gray-400'}`}
+2975-              />
+2976-              <button
+2977-                onClick={handleTranslation}
+2978-                disabled={isTranslating || !translationInput.trim()}
+2979:                className={`w-full mt-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors ${isTranslating || !translationInput.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-y-0.5'} ${isDarkMode ? 'bg-[#10B981] text-white hover:bg-[#34d399]' : 'bg-[#10B981] text-white hover:bg-[#059669]'}`}
+2980-              >
+2981-                {isTranslating ? <RefreshCw className="w-5 h-5 animate-spin" /> : <CustomTranslateIcon className="w-5 h-5" />}
+--
+2985-            
+2986-            {/* Output Side */}
+2987:            <div className={`p-6 rounded-[2rem] border flex flex-col ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+2988-              <div className="flex justify-between items-center mb-4">
+2989:                <span className={`text-sm font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Output</span>
+2990-                <button 
+2991-                  onClick={() => playTranslationAudio(translationOutput)}
+2992-                  disabled={!translationOutput || isTranslating || translationOutput.includes('failed')}
+2993:                  className={`p-1.5 rounded-full transition-colors ${!translationOutput || isTranslating || translationOutput.includes('failed') ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'bg-white/10 text-emerald-400 hover:bg-white/20' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+2994-                  title="Listen to translation"
+2995-                >
+--
+2997-                </button>
+2998-              </div>
+2999:              <div className={`w-full flex-1 min-h-[150px] p-4 rounded-xl border text-lg font-medium transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-emerald-100' : 'bg-gray-50 border-gray-200 text-slate-800'} ${isTranslating ? 'animate-pulse' : ''} ${!translationOutput ? 'opacity-50' : ''}`}>
+3000-                {translationOutput || "Translation will appear here..."}
+3001-              </div>
+--
+3006-        <div className="w-full max-w-3xl mx-auto px-4 py-8 flex-1">
+3007-          <div className="flex items-center justify-between mb-8">
+3008:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3009-              Progress <span className="text-[#10B981]">Dashboard</span>
+3010-            </h2>
+--
+3012-              <button 
+3013-                onClick={() => setShowSrsSettings(true)}
+3014:                className={`p-2 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+3015-                title="Settings"
+3016-              >
+--
+3019-              <button 
+3020-                onClick={() => setShowQuiz(true)}
+3021:                className={`p-2 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+3022-                title="Play Vocabulary Quiz"
+3023-              >
+--
+3036-          </div>
+3037-
+3038:          <div className={`mb-8 p-6 rounded-[2rem] border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3039-            <div className="flex justify-between items-center mb-4">
+3040:              <h3 className={`font-bold font-outfit ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Daily Goal</h3>
+3041-              <div className="flex items-center gap-2">
+3042:                <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3043-                  {userStats.todayReviews} / {userStats.dailyGoal} words
+3044-                </span>
+3045-                <button 
+3046-                  onClick={() => setShowSrsSettings(true)}
+3047:                  className={`p-1.5 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+3048-                  title="Settings"
+3049-                >
+--
+3052-              </div>
+3053-            </div>
+3054:            <div className={`w-full h-5 rounded-full overflow-hidden relative ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'}`}>
+3055-              <motion.div 
+3056-                className="h-full bg-[#10B981] flex items-center justify-end px-2"
+--
+3073-          </div>
+3074-
+3075:          <div className={`mb-8 p-6 rounded-[2rem] border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3076:            <h3 className={`font-bold font-outfit mb-4 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Learn Mode: Practice by Difficulty</h3>
+3077-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+3078-              {(['Beginner', 'Intermediate', 'Advanced'] as const).map(level => (
+--
+3081-                  onClick={() => startLearnMode(level)}
+3082-                  className={`py-3 rounded-xl font-bold transition-all text-sm flex flex-col items-center gap-1.5 ${
+3083:                    level === 'Beginner' ? (isDarkMode ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50' : 'bg-green-100 text-green-700 hover:bg-green-200') :
+3084:                    level === 'Intermediate' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400 hover:bg-yellow-900/50' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200') :
+3085:                    (isDarkMode ? 'bg-red-900/30 text-red-400 hover:bg-red-900/50' : 'bg-red-100 text-red-700 hover:bg-red-200')
+3086-                  }`}
+3087-                >
+--
+3094-
+3095-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+3096:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3097-              <div className="text-4xl font-outfit font-extrabold text-[#10B981] mb-2">{savedWords.length}</div>
+3098:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Saved Words</div>
+3099-            </div>
+3100:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3101-              <div className="text-4xl font-outfit font-extrabold text-[#10B981] mb-2">{userStats.wordsLearned}</div>
+3102:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Words Learned</div>
+3103-            </div>
+3104:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3105-              <div className="text-4xl font-outfit font-extrabold text-[#10B981] mb-2">{userStats.totalReviews}</div>
+3106:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Total Reviews Completed</div>
+3107-            </div>
+3108:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3109-              <div className="text-4xl font-outfit font-extrabold text-[#10B981] mb-2">{userStats.correctReviews}</div>
+3110:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Correct Reviews</div>
+3111-            </div>
+3112:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3113-              <div className="text-4xl font-outfit font-extrabold text-[#10B981] mb-2">
+3114-                {userStats.totalReviews > 0 ? Math.round((userStats.correctReviews / userStats.totalReviews) * 100) : 0}%
+3115-              </div>
+3116:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Accuracy</div>
+3117-            </div>
+3118:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3119-              <div className="text-4xl font-outfit font-extrabold text-[#10B981] mb-2">{userStats.currentStreak}</div>
+3120:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Day Streak</div>
+3121-            </div>
+3122-          </div>
+--
+3147-
+3148-            return (
+3149:              <div className={`rounded-[2.5rem] shadow-sm border p-8 mb-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3150:                <h3 className={`text-xl font-outfit font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Learning Progress (Last 14 Days)</h3>
+3151-                <div className="w-full h-72 text-sm">
+3152-                  <ResponsiveContainer width="100%" height="100%">
+3153-                    <LineChart data={paddedHistory}>
+3154:                      <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#333' : '#eee'} vertical={false} />
+3155-                      <XAxis 
+3156-                        dataKey="date" 
+3157:                        stroke={isDarkMode ? '#888' : '#aaa'} 
+3158:                        tick={{ fill: isDarkMode ? '#888' : '#aaa' }} 
+3159-                        tickFormatter={(date) => {
+3160-                          const parts = date.split('-');
+--
+3166-                      />
+3167-                      <YAxis 
+3168:                        stroke={isDarkMode ? '#888' : '#aaa'} 
+3169:                        tick={{ fill: isDarkMode ? '#888' : '#aaa' }} 
+3170-                        tickLine={false}
+3171-                        axisLine={false}
+--
+3173-                      />
+3174-                      <Tooltip 
+3175:                        contentStyle={{ backgroundColor: isDarkMode ? '#222' : '#fff', borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+3176:                        labelStyle={{ color: isDarkMode ? '#ccc' : '#666', fontWeight: 'bold', marginBottom: '4px' }}
+3177-                      />
+3178-                      <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
+3179:                      <ReferenceLine y={userStats.dailyGoal} label={{ position: 'top', value: `Daily Goal (${userStats.dailyGoal})`, fill: isDarkMode ? '#888' : '#aaa', fontSize: 12 }} stroke={isDarkMode ? '#555' : '#ccc'} strokeDasharray="3 3" />
+3180-                      <Line type="monotone" dataKey="wordsLearned" name="New Words Saved" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+3181-                      <Line type="monotone" dataKey="reviewsCompleted" name="Reviews Completed" stroke="#10B981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+--
+3203-
+3204-            return (
+3205:              <div className={`rounded-[2.5rem] shadow-sm border p-8 mb-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3206:                <h3 className={`text-xl font-outfit font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Tag Usage</h3>
+3207-                <div className="w-full h-72 text-sm">
+3208-                  <ResponsiveContainer width="100%" height="100%">
+3209-                    <BarChart data={tagData}>
+3210:                      <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#333' : '#eee'} vertical={false} />
+3211-                      <XAxis 
+3212-                        dataKey="name" 
+3213:                        stroke={isDarkMode ? '#888' : '#aaa'} 
+3214:                        tick={{ fill: isDarkMode ? '#888' : '#aaa' }} 
+3215-                        tickLine={false}
+3216-                        axisLine={false}
+3217-                      />
+3218-                      <YAxis 
+3219:                        stroke={isDarkMode ? '#888' : '#aaa'} 
+3220:                        tick={{ fill: isDarkMode ? '#888' : '#aaa' }} 
+3221-                        tickLine={false}
+3222-                        axisLine={false}
+--
+3224-                      />
+3225-                      <Tooltip 
+3226:                        contentStyle={{ backgroundColor: isDarkMode ? '#222' : '#fff', borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+3227:                        labelStyle={{ color: isDarkMode ? '#ccc' : '#666', fontWeight: 'bold', marginBottom: '4px' }}
+3228:                        cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}
+3229-                      />
+3230-                      <Bar dataKey="count" name="Words" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+--
+3236-          })()}
+3237-
+3238:          <div className={`rounded-[2.5rem] shadow-sm border p-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3239-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+3240-              <div className="flex items-center gap-3">
+3241:                <h3 className={`text-xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Saved Words List</h3>
+3242-                {savedWords.length > 0 && (
+3243:                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${isDarkMode ? 'bg-[#10B981]/20 text-[#10B981]' : 'bg-[#10B981]/10 text-[#10B981]'}`}>
+3244-                    {filteredSavedWords.length} / {savedWords.length}
+3245-                  </span>
+--
+3252-                  className={`px-4 py-2 rounded-xl text-sm font-bold outline-none border transition-colors ${
+3253-                    difficultyFilter !== 'All' 
+3254:                      ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+3255:                      : (isDarkMode ? 'bg-[#111] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+3256-                  }`}
+3257-                >
+--
+3267-                    className={`px-4 py-2 rounded-xl text-sm font-bold outline-none border transition-colors max-w-[150px] truncate ${
+3268-                      selectedTagFilter !== 'All'
+3269:                        ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+3270:                        : (isDarkMode ? 'bg-[#111] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+3271-                    }`}
+3272-                  >
+--
+3278-                  <button 
+3279-                    onClick={() => startLearnMode()}
+3280:                    className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors ${isDarkMode ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+3281-                  >
+3282-                    <Brain className="w-4 h-4" /> Learn Mode
+--
+3286-            </div>
+3287-            {savedWords.length === 0 ? (
+3288:              <p className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>You haven&apos;t saved any words yet.</p>
+3289-            ) : (
+3290-              <div className="flex flex-col gap-3">
+3291-                {filteredSavedWords.length === 0 ? (
+3292:                  <p className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>No words match your filters.</p>
+3293-                ) : (
+3294-                  filteredSavedWords.map((word, idx) => {
+--
+3298-                        key={idx}
+3299-                        onClick={() => handleSearch(undefined, word.word)}
+3300:                        className={`p-4 rounded-2xl border flex flex-col justify-between cursor-pointer transition-colors ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 hover:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 hover:bg-[#F0FDF8]'}`}
+3301-                      >
+3302-                        <div className="flex flex-col gap-3">
+--
+3304-                            <div className="flex flex-col">
+3305-                              <div className="flex items-center gap-2">
+3306:                                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>{word.word}</h4>
+3307-                                {isDue && (
+3308:                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-amber-900/30 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>Due</span>
+3309-                                )}
+3310-                              </div>
+3311:                              <p className={`text-xs mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-slate-500'} line-clamp-1`}>{word.bengaliMeaning}</p>
+3312-                            </div>
+3313-                            <div className="flex flex-col items-end gap-1.5 shrink-0 ml-3">
+3314-                              {word.difficultyLevel && (
+3315-                                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+3316:                                  word.difficultyLevel.toLowerCase() === 'beginner' ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700') :
+3317:                                  word.difficultyLevel.toLowerCase() === 'intermediate' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700') :
+3318:                                  (isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700')
+3319-                                }`}>
+3320-                                  {word.difficultyLevel}
+--
+3322-                              )}
+3323-                              {word.tags && word.tags.length > 0 && (
+3324:                                <span className={`text-[10px] font-bold flex items-center gap-1 px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-indigo-900/30 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+3325-                                  <Tag className="w-2.5 h-2.5" /> {word.tags.length} {word.tags.length === 1 ? 'Tag' : 'Tags'}
+3326-                                </span>
+--
+3337-                              onClick={(e) => e.stopPropagation()}
+3338-                              className={`w-full text-xs px-3 py-1.5 rounded-lg border outline-none transition-colors ${
+3339:                                isDarkMode 
+3340-                                  ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-[#10B981]' 
+3341-                                  : 'bg-white border-gray-200 text-slate-800 placeholder:text-slate-400 focus:border-[#10B981]'
+--
+3345-                              <div className="flex flex-col gap-1 mt-1">
+3346-                                {word.customExamples.map((ex, exIdx) => (
+3347:                                  <div key={exIdx} className={`text-[11px] flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-600/80'}`}>
+3348-                                    <span className="opacity-70">&bull;</span> {ex}
+3349-                                  </div>
+--
+3354-
+3355-                          <div className="flex justify-between items-end mt-3">
+3356:                            <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+3357-                              Next review: {word.srs ? new Date(word.srs.nextReviewDate).toLocaleDateString() : 'N/A'}
+3358-                            </p>
+--
+3367-          </div>
+3368-
+3369:          <div className={`rounded-[2.5rem] shadow-sm border p-8 mt-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3370:            <h3 className={`text-xl font-outfit font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Offline Access & Sync</h3>
+3371:            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3372-              Download words to access them without an internet connection. Your learning progress while offline will automatically sync when you reconnect.
+3373-            </p>
+3374-            
+3375-            <div className="mb-6">
+3376:              <h4 className={`text-sm font-bold uppercase tracking-widest mb-3 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3377-                Quick Download Collections
+3378-              </h4>
+--
+3390-                    }}
+3391-                    disabled={downloadingWords || isOffline}
+3392:                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors border ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 disabled:opacity-50' : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-slate-600 disabled:opacity-50'}`}
+3393-                  >
+3394-                    + {category.name} ({category.words.length})
+--
+3404-                onChange={(e) => setWordsToDownload(e.target.value)}
+3405-                placeholder="e.g. ubiquitous, ephemeral, serendipity"
+3406:                className={`flex-1 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 ${isDarkMode ? 'bg-black/50 border-white/10 text-white placeholder-gray-600' : 'bg-gray-50 border-gray-200 text-slate-800 placeholder-gray-400'}`}
+3407-                disabled={downloadingWords || isOffline}
+3408-              />
+--
+3417-            </div>
+3418-            {downloadingWords && (
+3419:              <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-4">
+3420-                <div className="bg-[#10B981] h-2.5 rounded-full transition-all duration-300" style={{ width: `${downloadProgress}%` }}></div>
+3421-              </div>
+3422-            )}
+3423-            
+3424:            <div className={`p-4 rounded-xl border flex items-center justify-between mb-8 ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+3425-              <div className="flex items-center gap-3">
+3426-                {isOffline ? (
+--
+3432-                )}
+3433-                <div>
+3434:                  <p className={`font-bold ${isDarkMode ? 'text-gray-200' : 'text-slate-700'}`}>
+3435-                    {isOffline ? 'Currently Offline' : pendingSync ? 'Syncing Progress...' : 'All Progress Synced'}
+3436-                  </p>
+3437:                  <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+3438-                    {isOffline ? 'Changes will sync when reconnected' : pendingSync ? 'Updating your local data...' : 'Your data is up to date'}
+3439-                  </p>
+--
+3442-            </div>
+3443-
+3444:            <div className={`pt-6 border-t ${isDarkMode ? 'border-white/10' : 'border-gray-200'}`}>
+3445-              <div className="flex items-center justify-between mb-4">
+3446:                <h4 className={`text-sm font-bold uppercase tracking-widest ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3447-                  Downloaded Words ({downloadedWordsList.length})
+3448-                </h4>
+--
+3460-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+3461-                  {downloadedWordsList.map((word) => (
+3462:                    <div key={word} className={`flex items-center justify-between p-2 rounded-lg border ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'} transition-colors`}>
+3463:                      <span className={`text-sm font-bold truncate ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+3464-                        {word}
+3465-                      </span>
+3466-                      <button 
+3467-                        onClick={() => removeDownloadedWord(word)}
+3468:                        className={`p-1.5 rounded-md transition-colors ${isDarkMode ? 'text-gray-500 hover:text-red-400 hover:bg-red-500/20' : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}`}
+3469-                        title={`Remove "${word}" from downloads`}
+3470-                      >
+--
+3475-                </div>
+3476-              ) : (
+3477:                <div className={`p-4 rounded-xl border text-center ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+3478:                  <p className={`text-sm italic ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>No words downloaded yet.</p>
+3479-                </div>
+3480-              )}
+--
+3485-        <div className="w-full max-w-3xl mx-auto px-4 py-8 flex-1">
+3486-          <div className="flex items-center justify-between mb-8">
+3487:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3488-              Your <span className="text-[#10B981]">Glossary</span>
+3489-            </h2>
+3490-            {savedWords.length > 0 && (
+3491:              <span className={`px-3 py-1 rounded-full text-sm font-bold ${isDarkMode ? 'bg-[#10B981]/20 text-[#10B981]' : 'bg-[#10B981]/10 text-[#10B981]'}`}>
+3492-                {glossaryFilteredWords.length} / {savedWords.length} Words
+3493-              </span>
+--
+3495-          </div>
+3496-
+3497:          <div className={`rounded-[2.5rem] shadow-sm border p-8 mb-6 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3498-            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+3499-              <div className="relative flex-1">
+3500:                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+3501-                <input
+3502-                  type="text"
+--
+3504-                  value={glossarySearchQuery}
+3505-                  onChange={(e) => setGlossarySearchQuery(e.target.value)}
+3506:                  className={`w-full pl-9 pr-4 py-2 rounded-xl text-sm outline-none border transition-colors ${isDarkMode ? 'bg-[#222] border-white/10 text-white focus:border-[#10B981]' : 'bg-gray-50 border-gray-200 text-slate-700 focus:border-[#10B981]'}`}
+3507-                />
+3508-              </div>
+--
+3513-                  className={`px-4 py-2 rounded-xl text-sm font-bold outline-none border transition-colors ${
+3514-                    difficultyFilter !== 'All' 
+3515:                      ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+3516:                      : (isDarkMode ? 'bg-[#222] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+3517-                  }`}
+3518-                >
+--
+3528-                    className={`px-4 py-2 rounded-xl text-sm font-bold outline-none border transition-colors max-w-[150px] truncate ${
+3529-                      selectedTagFilter !== 'All' 
+3530:                        ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+3531:                        : (isDarkMode ? 'bg-[#222] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+3532-                    }`}
+3533-                  >
+--
+3541-            {savedWords.length === 0 ? (
+3542-              <div className="text-center py-8">
+3543:                <BookOpen className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-slate-300'}`} />
+3544:                <p className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>You haven&apos;t saved any words yet.</p>
+3545-              </div>
+3546-            ) : (
+--
+3548-                {glossaryFilteredWords.length === 0 ? (
+3549-                  <div className="col-span-full text-center py-8">
+3550:                    <p className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>No words match your search or filters.</p>
+3551-                  </div>
+3552-                ) : (
+--
+3558-                        handleSearch(undefined, word.word);
+3559-                      }}
+3560:                      className={`p-4 rounded-2xl border flex flex-col justify-between cursor-pointer transition-all hover:-translate-y-1 ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 hover:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 hover:bg-white shadow-sm hover:shadow-md'}`}
+3561-                    >
+3562-                      <div className="flex flex-col flex-1">
+3563-                        <div className="flex justify-between items-start mb-2">
+3564-                          <div className="flex items-center gap-2">
+3565:                            <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{word.word}</h4>
+3566-                          </div>
+3567-                          <div className="flex flex-col items-end gap-1.5 shrink-0 ml-3">
+3568-                            {word.difficultyLevel && (
+3569-                              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+3570:                                word.difficultyLevel.toLowerCase() === 'beginner' ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700') :
+3571:                                word.difficultyLevel.toLowerCase() === 'intermediate' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700') :
+3572:                                (isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700')
+3573-                              }`}>
+3574-                                {word.difficultyLevel}
+--
+3576-                            )}
+3577-                            {word.tags && word.tags.length > 0 && (
+3578:                              <span className={`text-[10px] font-bold flex items-center gap-1 px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-indigo-900/30 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+3579-                                <Tag className="w-2.5 h-2.5" /> {word.tags.length} {word.tags.length === 1 ? 'Tag' : 'Tags'}
+3580-                              </span>
+--
+3583-                        </div>
+3584-                        {word.englishDefinition && (
+3585:                          <p className={`text-sm line-clamp-2 mt-1 mb-2 ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>{word.englishDefinition}</p>
+3586-                        )}
+3587-                      </div>
+3588-                      
+3589:                      <div className="mt-auto pt-3 border-t border-dashed border-gray-200 dark:border-white/10">
+3590-                        
+3591-                        <div className="relative flex flex-col gap-2">
+--
+3597-                            onClick={(e) => e.stopPropagation()}
+3598-                            className={`w-full text-xs px-3 py-1.5 rounded-lg border outline-none transition-colors ${
+3599:                              isDarkMode 
+3600-                                ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-[#10B981]' 
+3601-                                : 'bg-gray-50 border-gray-200 text-slate-800 placeholder:text-slate-400 focus:border-[#10B981]'
+--
+3605-                            <div className="flex flex-col gap-1 mt-1">
+3606-                              {word.customExamples.map((ex, exIdx) => (
+3607:                                <div key={exIdx} className={`text-[11px] flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-600/80'}`}>
+3608-                                  <span className="opacity-70">&bull;</span> {ex}
+3609-                                </div>
+--
+3623-        <div className="w-full max-w-2xl mx-auto px-4 py-8 flex-1">
+3624-          <div className="flex items-center justify-between mb-8">
+3625:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3626-              Search <span className="text-[#10B981]">History</span>
+3627-            </h2>
+--
+3629-              <button 
+3630-                onClick={() => setShowClearHistoryDialog(true)}
+3631:                className={`flex items-center gap-2 text-sm transition-colors px-4 py-2 rounded-xl font-medium ${isDarkMode ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400' : 'bg-red-50 hover:bg-red-100 text-red-600'}`}
+3632-              >
+3633-                <Trash2 className="w-4 h-4" /> Clear History
+--
+3636-          </div>
+3637-
+3638:          <div className={`rounded-[2.5rem] shadow-sm border p-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3639-            {searchHistory.length === 0 ? (
+3640-              <div className="flex flex-col items-center justify-center text-center py-8">
+3641:                <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center mb-6 ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#F0FDF8] text-[#10B981]'}`}>
+3642-                  <History className="w-10 h-10" />
+3643-                </div>
+3644:                <p className={`font-medium text-lg ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>No recent searches</p>
+3645-              </div>
+3646-            ) : (
+--
+3666-                        }
+3667-                      }}
+3668:                      className={`p-4 rounded-2xl border transition-all cursor-pointer group flex justify-between items-center outline-none ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 focus:border-[#10B981]/50 hover:bg-white/5 focus:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 focus:border-[#10B981]/30 hover:bg-[#F0FDF8] focus:bg-[#F0FDF8]'}`}
+3669-                    >
+3670-                      <div>
+3671:                        <h4 className={`font-bold text-lg transition-colors ${isDarkMode ? 'text-gray-200 group-hover:text-[#10B981] group-focus:text-[#10B981]' : 'text-slate-800 group-hover:text-[#10B981] group-focus:text-[#10B981]'}`}>{item.word}</h4>
+3672:                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+3673-                          {new Date(item.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+3674-                        </p>
+--
+3680-                            setSearchHistory(prev => prev.filter(historyItem => historyItem.word !== item.word || historyItem.date !== item.date));
+3681-                          }}
+3682:                          className={`p-2 rounded-full opacity-0 group-hover:opacity-100 group-focus:opacity-100 group-focus-within:opacity-100 transition-all ${isDarkMode ? 'hover:bg-red-500/10 text-red-400' : 'hover:bg-red-50 text-red-500'}`}
+3683-                          title="Remove from history"
+3684-                        >
+3685-                          <X className="w-4 h-4" />
+3686-                        </button>
+3687:                        <ArrowRight className={`w-5 h-5 transition-colors ${isDarkMode ? 'text-gray-600 group-hover:text-[#10B981] group-focus:text-[#10B981]' : 'text-gray-300 group-hover:text-[#10B981] group-focus:text-[#10B981]'}`} />
+3688-                      </div>
+3689-                    </motion.div>
+--
+3697-        <div className="w-full max-w-3xl mx-auto px-4 py-8 flex-1">
+3698-          <div className="flex items-center justify-between mb-8">
+3699:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3700-              Vocabulary <span className="text-emerald-500">Quiz</span> 
+3701-              <Gamepad2 className="w-8 h-8 text-emerald-500" />
+--
+3705-                setShowQuizSettings(true);
+3706-              }}
+3707:              className={`p-2 rounded-full border transition-colors flex items-center gap-2 px-4 shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-slate-600 hover:bg-gray-50 hover:text-slate-900'}`}
+3708-            >
+3709-              <Settings className="w-4 h-4" />
+--
+3712-          </div>
+3713-
+3714:          <div className={`rounded-[2.5rem] shadow-sm border p-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3715-            {quizState === 'start' && (
+3716-              <div className="flex flex-col items-center justify-center text-center py-8">
+3717:                <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20 ${isDarkMode ? 'bg-emerald-950/50' : 'bg-[#F0FDF8]'}`}>
+3718-                  <Brain className="w-12 h-12 text-emerald-500" />
+3719-                </div>
+3720:                <h3 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Ready to test your knowledge?</h3>
+3721:                <p className={`mb-8 max-w-md ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3722-                  Take a {quizSettings.questionCount}-question quiz drawn from your saved words. Tests include meanings, missing words, and pronunciations!
+3723-                </p>
+--
+3736-                  className={`px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all duration-300 ${
+3737-                    savedWords.length < 4 
+3738:                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-white/5 dark:text-gray-600' 
+3739-                      : 'bg-[#10B981] text-white hover:bg-[#059669] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#10B981]/40'
+3740-                  }`}
+3741-                >
+3742:                  <Play className={`w-5 h-5 ${savedWords.length < 4 ? 'fill-gray-400 dark:fill-gray-600' : 'fill-current'}`} /> Start Quiz
+3743-                </button>
+3744-              </div>
+--
+3748-              <div className="w-full">
+3749-                <div className="flex items-center justify-between mb-8">
+3750:                  <span className={`text-sm font-bold ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+3751-                    Question {currentQuizIndex + 1} of {quizQuestions.length}
+3752-                  </span>
+3753-                  {quizTimeLeft !== null && (
+3754:                    <span className={`text-xl font-bold flex items-center gap-2 ${quizTimeLeft <= 5 ? 'text-red-500 animate-pulse' : isDarkMode ? 'text-blue-400' : 'text-blue-500'}`}>
+3755-                      ⏳ {quizTimeLeft}s
+3756-                    </span>
+3757-                  )}
+3758:                  <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3759-                    Score: {quizScore}
+3760-                  </span>
+3761-                </div>
+3762-                
+3763:                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-8 dark:bg-gray-700">
+3764-                  <div className="bg-[#10B981] h-2.5 rounded-full transition-all duration-500" style={{ width: `${((currentQuizIndex + 1) / quizQuestions.length) * 100}%` }}></div>
+3765-                </div>
+3766-
+3767:                <h3 className={`text-2xl font-bold mb-8 text-center leading-relaxed ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+3768-                  {quizQuestions[currentQuizIndex].questionText}
+3769-                </h3>
+--
+3777-                    let btnClass = `p-4 rounded-2xl border-2 text-left font-medium transition-all `;
+3778-                    if (!showResult) {
+3779:                      btnClass += isDarkMode ? 'border-white/10 hover:border-emerald-500/50 hover:bg-white/5' : 'border-gray-200 hover:border-emerald-500/50 hover:bg-gray-50';
+3780-                    } else if (isCorrect) {
+3781:                      btnClass += 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
+3782-                    } else if (isSelected && !isCorrect) {
+3783:                      btnClass += 'border-red-500 bg-red-500/10 text-red-600 dark:text-red-400';
+3784-                    } else {
+3785:                      btnClass += isDarkMode ? 'border-white/5 opacity-50' : 'border-gray-100 opacity-50';
+3786-                    }
+3787-
+--
+3810-                  <span className="text-4xl font-black">{quizScore}/{quizQuestions.length}</span>
+3811-                </div>
+3812:                <h3 className={`text-3xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+3813-                  {quizScore === quizQuestions.length ? 'Perfect Score! 🏆' : quizScore >= quizQuestions.length * 0.7 ? 'Great Job! 🌟' : quizScore >= quizQuestions.length * 0.4 ? 'Good Effort! 👍' : 'Keep Practicing! 💪'}
+3814-                </h3>
+3815:                <p className={`mb-8 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3816-                  You answered {quizScore} out of {quizQuestions.length} questions correctly.
+3817-                </p>
+--
+3829-                      setQuizState('start');
+3830-                    }}
+3831:                    className={`px-8 py-4 rounded-2xl font-bold transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-gray-200 hover:bg-gray-300 text-slate-800'}`}
+3832-                  >
+3833-                    Exit Quiz
+--
+3847-          className="flex flex-col items-center text-center px-4 pt-4 pb-12 w-full max-w-3xl mx-auto"
+3848-        >
+3849:          <h1 className={`text-5xl md:text-7xl font-outfit font-extrabold mb-6 leading-[1.1] text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3850-            Learn <span className="text-[#10B981]">English</span><br/>Easy
+3851-          </h1>
+3852-          
+3853:          <p className={`max-w-md mx-auto mb-10 text-base md:text-lg ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3854-            Search any word — get <span className="text-[#10B981] font-medium">Bengali meaning</span>, pronunciation, examples, tips & more. 100% free.
+3855-          </p>
+--
+3857-          {/* Search Bar */}
+3858-          <div className="w-full relative" ref={searchContainerRef}>
+3859:            <form onSubmit={handleSearch} className={`group w-full rounded-[2rem] shadow-sm p-1 sm:p-2 flex items-center border transition-all duration-300 ease-out z-20 relative focus-within:-translate-y-1 focus-within:scale-[1.01] focus-within:ring-4 focus-within:ring-[#10B981]/20 ${isDarkMode ? 'bg-[#111] border-white/10 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/50' : 'bg-white border-gray-100 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/30'}`}>
+3860-              {loading ? (
+3861:                <div className="ml-2 sm:ml-4 shrink-0 p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
+3862-                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#10B981] animate-spin" />
+3863-                </div>
+--
+3865-                <Search className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400 ml-2 sm:ml-4 shrink-0 transition-colors duration-300 group-focus-within:text-[#10B981]" />
+3866-              )}
+3867:              <div className="ml-1 sm:ml-3 shrink-0 flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-0.5">
+3868-                <button
+3869-                  type="button"
+3870-                  onClick={() => setSearchMode('en')}
+3871:                  className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-bold rounded-md transition-colors ${searchMode === 'en' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+3872-                >
+3873-                  EN 
+--
+3876-                  type="button"
+3877-                  onClick={() => setSearchMode('bn')}
+3878:                  className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-bold rounded-md transition-colors ${searchMode === 'bn' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+3879-                >
+3880-                  BN
+--
+3893-                }}
+3894-                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+3895:                className={`min-w-0 flex-1 w-20 bg-transparent border-none px-2 sm:px-4 py-3 sm:py-4 outline-none text-sm sm:text-lg ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-slate-700 placeholder-gray-400'}`} 
+3896-                placeholder={searchMode === 'en' ? "English word..." : "Bengali word..."} 
+3897-                maxLength={50}
+--
+3899-              {searchQuery.length > 0 && (
+3900-                <div className="flex items-center mr-1 sm:mr-2">
+3901:                  <span className={`text-xs mr-1 sm:mr-2 hidden md:inline-block ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+3902-                    {searchQuery.length}/50
+3903-                  </span>
+--
+3910-                      setShowSuggestions(false);
+3911-                    }}
+3912:                    className={`p-1 sm:p-1.5 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
+3913-                    title="Clear search"
+3914-                  >
+--
+3920-                type="button" 
+3921-                onClick={toggleListening}
+3922:                className={`p-1.5 sm:p-3 mr-1 sm:mr-2 rounded-full transition-colors shrink-0 ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : (isDarkMode ? 'text-gray-400 hover:bg-white/10' : 'text-gray-400 hover:bg-gray-100')}`}
+3923-                title={isListening ? "Stop listening" : "Search by voice"}
+3924-              >
+--
+3950-                  animate={{ opacity: 1, y: 0 }}
+3951-                  exit={{ opacity: 0, y: -10 }}
+3952:                  className={`absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-xl overflow-hidden z-20 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+3953-                >
+3954-                  {suggestionsLoading && (
+3955:                    <div className={`px-6 py-4 flex items-center gap-3 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3956-                      <Loader2 className="w-4 h-4 animate-spin text-[#10B981]" />
+3957-                      <span className="text-sm">Fetching suggestions...</span>
+--
+3962-                      key={idx}
+3963-                      onClick={() => handleSearch(undefined, sug.word)}
+3964:                      className={`px-6 py-4 cursor-pointer flex flex-col gap-1 transition-colors ${idx === selectedSuggestionIndex ? (isDarkMode ? 'bg-white/10' : 'bg-[#D1F4E6]/50') : ''} ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-[#F0FDF8] text-slate-700'}`}
+3965-                    >
+3966-                      <div className="flex items-center gap-3">
+3967:                        <Search className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+3968-                        <span className="font-medium">{sug.word}</span>
+3969-                        {sug.category && (
+3970:                          <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ${isDarkMode ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
+3971-                            {sug.category}
+3972-                          </span>
+--
+3974-                      </div>
+3975-                      {sug.definition && (
+3976:                        <span className={`text-sm pl-7 line-clamp-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+3977-                          {sug.definition}
+3978-                        </span>
+--
+3990-                  animate={{ opacity: 1, y: 0 }}
+3991-                  exit={{ opacity: 0, y: -10 }}
+3992:                  className={`absolute top-full left-0 right-0 mt-2 p-5 rounded-2xl border shadow-xl z-20 flex flex-col gap-3 ${isDarkMode ? 'bg-indigo-950/90 border-indigo-500/30 backdrop-blur-md' : 'bg-indigo-50/90 border-indigo-200 backdrop-blur-md'}`}
+3993-                >
+3994-                  <div className="flex items-start justify-between gap-4">
+3995-                    <div className="flex items-center gap-3">
+3996:                      <div className={`p-2 rounded-xl ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-200 text-indigo-700'}`}>
+3997-                        <Mic className="w-5 h-5" />
+3998-                      </div>
+3999-                      <div>
+4000:                        <p className={`text-sm font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-800'}`}>
+4001-                          {transcriptionFeedback.confidence === 'low' ? "Not completely sure we got that right." : "Here's what we heard."}
+4002-                        </p>
+4003:                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-indigo-400/80' : 'text-indigo-600/80'}`}>
+4004-                          You can edit the text above or press <Search className="inline w-3 h-3 mx-0.5" /> Search to continue.
+4005-                        </p>
+4006-                      </div>
+4007-                    </div>
+4008:                    <button type="button" onClick={() => setTranscriptionFeedback(null)} className={`p-1 mt-1 shrink-0 rounded-full ${isDarkMode ? 'hover:bg-indigo-400/20 text-indigo-300' : 'hover:bg-indigo-200 text-indigo-700'}`}>
+4009-                      <X className="w-5 h-5" />
+4010-                    </button>
+--
+4012-                  {transcriptionFeedback.alternatives && transcriptionFeedback.alternatives.length > 0 && (
+4013-                    <div className="flex flex-wrap items-center gap-2 mt-2 pt-3 border-t border-indigo-500/20">
+4014:                      <span className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Did you mean:</span>
+4015-                      {transcriptionFeedback.alternatives.map((alt, idx) => (
+4016-                        <button
+--
+4022-                            handleSearch(undefined, alt);
+4023-                          }}
+4024:                          className={`px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors border ${isDarkMode ? 'bg-indigo-900 border-indigo-700 text-indigo-100 hover:bg-indigo-800' : 'bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}
+4025-                        >
+4026-                          {alt}
+--
+4041-                key={word} 
+4042-                onClick={() => handleSearch(undefined, word)}
+4043:                className={`px-5 py-2 rounded-full border text-sm font-medium transition-colors ${isDarkMode ? 'border-white/10 text-emerald-400 bg-white/5 hover:bg-white/10' : 'border-[#BDE8DB] text-[#10B981] bg-[#F0FDF8] hover:bg-[#E6F5F1]'}`}
+4044-              >
+4045-                {word}
+--
+4060-                window.scrollTo({ top: 0, behavior: 'smooth' });
+4061-              }}
+4062:              className={`p-6 rounded-3xl border cursor-pointer group transition-all hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? 'bg-gradient-to-br from-[#111] to-[#0A0A0A] border-white/10 hover:border-indigo-500/50 shadow-indigo-500/10' : 'bg-white border-gray-100 hover:border-indigo-300 shadow-indigo-100/50'}`}
+4063-            >
+4064:              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+4065-                <CustomTranslateIcon className="w-6 h-6" />
+4066-              </div>
+4067:              <h3 className={`text-xl font-bold font-outfit mb-2 group-hover:text-indigo-500 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Language Translator</h3>
+4068:              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Translate full sentences between English and Bengali using Google AI.</p>
+4069-            </div>
+4070-            
+--
+4079-                window.scrollTo({ top: 0, behavior: 'smooth' });
+4080-              }}
+4081:              className={`p-6 rounded-3xl border cursor-pointer group transition-all hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? 'bg-gradient-to-br from-[#111] to-[#0A0A0A] border-white/10 hover:border-emerald-500/50 shadow-emerald-500/10' : 'bg-white border-gray-100 hover:border-emerald-300 shadow-emerald-100/50'}`}
+4082-            >
+4083:              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
+4084-                <Gamepad2 className="w-6 h-6" />
+4085-              </div>
+4086:              <h3 className={`text-xl font-bold font-outfit mb-2 group-hover:text-emerald-500 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Vocabulary Quiz</h3>
+4087:              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Test your knowledge and practice your saved words with our interactive quiz.</p>
+4088-            </div>
+4089-          </div>
+--
+4092-          <div className="w-full mt-16 text-left">
+4093-            <div className="flex items-center gap-3 mb-6">
+4094:              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+4095-                <Sun className="w-5 h-5" />
+4096-              </div>
+4097:              <h2 className={`text-2xl font-outfit font-bold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Word of the <span className="text-[#10B981]">Day</span></h2>
+4098-            </div>
+4099-
+4100-            {wotdLoading ? (
+4101:              <div className={`w-full h-48 rounded-[2.5rem] border animate-pulse ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}></div>
+4102-            ) : wotd ? (
+4103-              <div 
+4104-                onClick={() => handleSearch(undefined, wotd.word)}
+4105:                className={`w-full relative overflow-hidden rounded-[2.5rem] border p-8 transition-all hover:-translate-y-1 cursor-pointer group ${isDarkMode ? 'bg-gradient-to-br from-[#111] to-[#0A0A0A] border-white/10 hover:border-[#10B981]/50 hover:shadow-[0_8px_30px_rgb(16,185,129,0.1)]' : 'bg-white border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-[#10B981]/30'}`}
+4106-              >
+4107-                {/* Decorative Elements */}
+4108:                <div className={`absolute top-0 right-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none translate-x-1/2 -translate-y-1/2 transition-transform duration-700 group-hover:scale-110 ${isDarkMode ? 'bg-emerald-500' : 'bg-emerald-200'}`} />
+4109:                <div className={`absolute bottom-0 left-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none -translate-x-1/2 translate-y-1/2 transition-transform duration-700 group-hover:scale-110 ${isDarkMode ? 'bg-blue-500' : 'bg-emerald-100'}`} />
+4110-
+4111-                <div className="flex flex-col gap-6 relative z-10 w-full">
+4112-                  <div className="flex justify-between items-start gap-4">
+4113-                    <div className="flex-1">
+4114:                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black tracking-widest uppercase mb-4 shadow-sm ${isDarkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-700 border border-emerald-100/50'}`}>
+4115-                        <Calendar className="w-3.5 h-3.5" />
+4116-                        {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • WORD OF THE DAY
+4117-                      </div>
+4118:                      <h3 className={`text-4xl sm:text-5xl md:text-6xl font-outfit uppercase tracking-wider mb-2 transition-transform duration-300 group-hover:scale-[1.02] origin-left ${isDarkMode ? 'text-[#10B981] text-3d-sm filter drop-shadow-md' : 'text-[#10B981] text-3d-sm'}`}>
+4119-                        {wotd.word}
+4120-                      </h3>
+4121:                      <p className={`text-xl sm:text-2xl font-bold mt-2 font-serif italic ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+4122-                        {wotd.bengaliMeaning}
+4123-                      </p>
+--
+4127-                        <button
+4128-                          onClick={handleShareWotd}
+4129:                          className={`p-3 sm:p-4 rounded-full transition-all hover:scale-105 shadow-sm ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-emerald-500 hover:text-white border border-white/10' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100/50'}`}
+4130-                          title="Share Word of the Day"
+4131-                        >
+--
+4136-                          className={`p-3 sm:p-4 rounded-full transition-all hover:scale-105 shadow-sm ${
+4137-                            savedWords.some(w => w.word.toLowerCase() === wotd.word.toLowerCase())
+4138:                              ? (isDarkMode ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border border-emerald-200/50')
+4139:                              : (isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100/50')
+4140-                          }`}
+4141-                          title={savedWords.some(w => w.word.toLowerCase() === wotd.word.toLowerCase()) ? "Remove from Vocabulary" : "Save to Vocabulary"}
+--
+4147-
+4148-                  <div className={`mt-2`}>
+4149:                    <p className={`text-lg sm:text-xl font-bold uppercase leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+4150-                      {wotd.englishDefinition}
+4151-                    </p>
+--
+4158-          {/* Features Grid */}
+4159-          <div className="w-full grid grid-cols-2 gap-4 mt-16">
+4160:            <div className={`p-8 rounded-[2rem] border flex flex-col items-center justify-center text-center transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4161-              <div className="text-5xl font-outfit font-extrabold text-[#10B981] mb-2">∞</div>
+4162:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>Words<br/>Searchable</div>
+4163-            </div>
+4164:            <div className={`p-8 rounded-[2rem] border flex flex-col items-center justify-center text-center transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4165-              <div className="text-5xl font-outfit font-extrabold text-[#10B981] mb-2">100%</div>
+4166:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>Free Forever</div>
+4167-            </div>
+4168:            <div className={`p-8 rounded-[2rem] border flex flex-col items-center justify-center text-center transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4169-              <div className="text-5xl font-outfit font-extrabold text-[#10B981] mb-2">0</div>
+4170:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>Daily Limits</div>
+4171-            </div>
+4172:            <div className={`p-8 rounded-[2rem] border flex flex-col items-center justify-center text-center transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4173-              <div className="text-5xl font-outfit font-extrabold text-[#10B981] mb-2">1</div>
+4174:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>Goal: Fluency</div>
+4175-            </div>
+4176-          </div>
+--
+4182-                key={feature.id}
+4183-                onClick={() => setSelectedFeatureDetails(feature)}
+4184:                className={`p-6 rounded-[2rem] border flex flex-col items-start text-left cursor-pointer group transition-all hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? `bg-[#111] border-white/10 hover:border-${feature.colorClass.replace('text-', '')}/50` : `bg-white border-gray-100 hover:border-${feature.colorClass.replace('text-', '')}/30`}`}
+4185-              >
+4186-                <div className="flex w-full justify-between items-start mb-4">
+4187:                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${isDarkMode ? feature.darkBgClass + ' ' + feature.darkColorClass : feature.bgClass + ' ' + feature.colorClass}`}>
+4188-                    {feature.icon}
+4189-                  </div>
+4190:                  <div className={`text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${isDarkMode ? feature.darkColorClass : feature.colorClass}`}>
+4191-                    Learn More <ArrowRight className="w-3 h-3" />
+4192-                  </div>
+4193-                </div>
+4194:                <h3 className={`text-xl font-outfit font-extrabold mb-2 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>{feature.title}</h3>
+4195:                <p className={`text-base ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>{feature.whatItDoes[0]}</p>
+4196-              </div>
+4197-            ))}
+--
+4201-          <div className="mt-16 mb-8 flex flex-col items-center text-center">
+4202-            <div className="flex items-center gap-2 mb-4">
+4203:              <Leaf className={`w-6 h-6 ${isDarkMode ? 'text-[#10B981]' : 'text-[#064E3B]'}`} />
+4204-              <span className="text-xl font-outfit font-extrabold text-[#10B981] text-3d-sm">Learn English Easy</span>
+4205-            </div>
+4206:            <p className={`text-sm max-w-sm ${isDarkMode ? 'text-gray-600' : 'text-slate-300'}`}>
+4207-              Built with love for every Bengali speaker striving to master the English language.
+4208-            </p>
+--
+4273-          {/* Search Bar (Top when result is shown) */}
+4274-          <div className="w-full relative mb-12" ref={topSearchContainerRef}>
+4275:            <form onSubmit={handleSearch} className={`group w-full rounded-[2rem] shadow-sm p-1 sm:p-2 flex items-center border transition-all duration-300 ease-out z-20 relative focus-within:-translate-y-1 focus-within:scale-[1.01] focus-within:ring-4 focus-within:ring-[#10B981]/20 ${isDarkMode ? 'bg-[#111] border-white/10 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/50' : 'bg-white border-gray-100 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/30'}`}>
+4276-              {loading ? (
+4277:                <div className="ml-2 sm:ml-4 shrink-0 p-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
+4278-                  <Loader2 className="w-4 h-4 sm:w-5 h-5 text-[#10B981] animate-spin" />
+4279-                </div>
+--
+4281-                <Search className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400 ml-2 sm:ml-4 shrink-0 transition-colors duration-300 group-focus-within:text-[#10B981]" />
+4282-              )}
+4283:              <div className="ml-1 sm:ml-3 shrink-0 flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-0.5">
+4284-                <button
+4285-                  type="button"
+4286-                  onClick={() => setSearchMode('en')}
+4287:                  className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-bold rounded-md transition-colors ${searchMode === 'en' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+4288-                >
+4289-                  EN
+--
+4292-                  type="button"
+4293-                  onClick={() => setSearchMode('bn')}
+4294:                  className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-bold rounded-md transition-colors ${searchMode === 'bn' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+4295-                >
+4296-                  BN
+--
+4309-                }}
+4310-                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+4311:                className={`min-w-0 flex-1 w-20 bg-transparent border-none px-2 sm:px-4 py-3 outline-none text-sm sm:text-lg ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-slate-700 placeholder-gray-400'}`} 
+4312-                placeholder={searchMode === 'en' ? "English word..." : "Bengali word..."} 
+4313-                maxLength={50}
+--
+4315-              {searchQuery.length > 0 && (
+4316-                <div className="flex items-center mr-1 sm:mr-2">
+4317:                  <span className={`text-xs mr-2 hidden md:inline-block ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+4318-                    {searchQuery.length}/50
+4319-                  </span>
+--
+4326-                      setShowSuggestions(false);
+4327-                    }}
+4328:                    className={`p-1 sm:p-1.5 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
+4329-                    title="Clear search"
+4330-                  >
+--
+4336-                type="button" 
+4337-                onClick={toggleListening}
+4338:                className={`p-1.5 sm:p-2 mr-1 sm:mr-2 rounded-full transition-colors shrink-0 ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : (isDarkMode ? 'text-gray-400 hover:bg-white/10' : 'text-gray-400 hover:bg-gray-100')}`}
+4339-                title={isListening ? "Stop listening" : "Search by voice"}
+4340-              >
+--
+4357-                  animate={{ opacity: 1, y: 0 }}
+4358-                  exit={{ opacity: 0, y: -10 }}
+4359:                  className={`absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-xl overflow-hidden z-20 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+4360-                >
+4361-                  {suggestionsLoading && (
+4362:                    <div className={`px-6 py-4 flex items-center gap-3 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+4363-                      <Loader2 className="w-4 h-4 animate-spin text-[#10B981]" />
+4364-                      <span className="text-sm">Fetching suggestions...</span>
+--
+4369-                      key={idx}
+4370-                      onClick={() => handleSearch(undefined, sug.word)}
+4371:                      className={`px-6 py-4 cursor-pointer flex flex-col gap-1 transition-colors ${idx === selectedSuggestionIndex ? (isDarkMode ? 'bg-white/10' : 'bg-[#D1F4E6]/50') : ''} ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-[#F0FDF8] text-slate-700'}`}
+4372-                    >
+4373-                      <div className="flex items-center gap-3">
+4374:                        <Search className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+4375-                        <span className="font-medium">{sug.word}</span>
+4376-                        {sug.category && (
+4377:                          <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ${isDarkMode ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
+4378-                            {sug.category}
+4379-                          </span>
+--
+4381-                      </div>
+4382-                      {sug.definition && (
+4383:                        <span className={`text-sm pl-7 line-clamp-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+4384-                          {sug.definition}
+4385-                        </span>
+--
+4397-                  animate={{ opacity: 1, y: 0 }}
+4398-                  exit={{ opacity: 0, y: -10 }}
+4399:                  className={`absolute top-full left-0 right-0 mt-2 p-5 rounded-2xl border shadow-xl z-20 flex flex-col gap-3 ${isDarkMode ? 'bg-indigo-950/90 border-indigo-500/30 backdrop-blur-md' : 'bg-indigo-50/90 border-indigo-200 backdrop-blur-md'}`}
+4400-                >
+4401-                  <div className="flex items-start justify-between gap-4">
+4402-                    <div className="flex items-center gap-3">
+4403:                      <div className={`p-2 rounded-xl ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-200 text-indigo-700'}`}>
+4404-                        <Mic className="w-5 h-5" />
+4405-                      </div>
+4406-                      <div>
+4407:                        <p className={`text-sm font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-800'}`}>
+4408-                          {transcriptionFeedback.confidence === 'low' ? "Not completely sure we got that right." : "Here's what we heard."}
+4409-                        </p>
+4410:                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-indigo-400/80' : 'text-indigo-600/80'}`}>
+4411-                          You can edit the text above or press <Search className="inline w-3 h-3 mx-0.5" /> Search to continue.
+4412-                        </p>
+4413-                      </div>
+4414-                    </div>
+4415:                    <button type="button" onClick={() => setTranscriptionFeedback(null)} className={`p-1 mt-1 shrink-0 rounded-full ${isDarkMode ? 'hover:bg-indigo-400/20 text-indigo-300' : 'hover:bg-indigo-200 text-indigo-700'}`}>
+4416-                      <X className="w-5 h-5" />
+4417-                    </button>
+--
+4419-                  {transcriptionFeedback.alternatives && transcriptionFeedback.alternatives.length > 0 && (
+4420-                    <div className="flex flex-wrap items-center gap-2 mt-2 pt-3 border-t border-indigo-500/20">
+4421:                      <span className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Did you mean:</span>
+4422-                      {transcriptionFeedback.alternatives.map((alt, idx) => (
+4423-                        <button
+--
+4429-                            handleSearch(undefined, alt);
+4430-                          }}
+4431:                          className={`px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors border ${isDarkMode ? 'bg-indigo-900 border-indigo-700 text-indigo-100 hover:bg-indigo-800' : 'bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}
+4432-                        >
+4433-                          {alt}
+--
+4442-
+4443-          <div className="flex items-center justify-center gap-3 mb-8 relative">
+4444:            <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+4445:            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+4446-              <Search className="w-4 h-4" />
+4447-            </div>
+4448:            <h2 className={`text-2xl font-outfit font-bold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Dictionary <span className="text-[#10B981]">Result</span></h2>
+4449:            <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+4450-          </div>
+4451-          
+4452-          <button 
+4453-            onClick={goHome}
+4454:            className={`mb-6 flex items-center gap-2 text-sm font-bold transition-colors ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+4455-          >
+4456-            ← Back to Home
+4457-          </button>
+4458-          
+4459:          <div className={`rounded-[2.5rem] shadow-sm overflow-hidden border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4460-            <div className="p-8 md:p-10">
+4461-              {result.isMisspelled && (
+4462:                <div className={`w-full mb-6 p-4 rounded-2xl flex flex-col gap-3 border ${isDarkMode ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200'}`}>
+4463-                  <div className="flex items-center gap-2">
+4464:                    <Info className={`w-5 h-5 shrink-0 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`} />
+4465:                    <p className={`text-sm font-medium ${isDarkMode ? 'text-amber-300' : 'text-amber-800'}`}>
+4466-                      Showing results for <span className="font-bold">&quot;{result.word}&quot;</span>. The word you searched for might have been misspelled.
+4467-                    </p>
+--
+4469-                  {result.spellcheckSuggestions && result.spellcheckSuggestions.length > 0 && (
+4470-                    <div className="flex flex-wrap items-center gap-2 lg:ml-7">
+4471:                      <span className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-amber-500/80' : 'text-amber-700/80'}`}>Did you mean:</span>
+4472-                      {result.spellcheckSuggestions.map((suggestion, idx) => (
+4473-                        <button
+4474-                          key={idx}
+4475-                          onClick={() => handleSearch(undefined, suggestion)}
+4476:                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${isDarkMode ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30' : 'bg-white/60 text-amber-900 border border-amber-200 hover:bg-white shadow-sm'}`}
+4477-                        >
+4478-                          {suggestion}
+--
+4486-              <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-6">
+4487-                <div className="flex flex-col flex-1">
+4488:                  <div className={`mb-4 px-4 py-1.5 w-fit rounded-full text-sm font-bold tracking-wide ${isDarkMode ? 'bg-emerald-950/30 text-emerald-400' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+4489-                    {currentDate}
+4490-                  </div>
+--
+4492-                    <div>
+4493-                      <h3 className="text-5xl font-outfit font-extrabold text-[#10B981] mb-4 text-3d-sm">{result.word}</h3>
+4494:                      <div className={`inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-[#1e293b] border-slate-700 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-600'}`}>
+4495-                        <Volume2 className="w-4 h-4 opacity-70" />
+4496-                        <span className="font-mono text-base font-medium tracking-wide">{result.phonetic}</span>
+--
+4503-                        <button 
+4504-                          onClick={isRecording ? stopRecording : startRecording}
+4505:                          className={`px-4 h-12 sm:h-14 rounded-2xl border flex items-center justify-center gap-2 transition-colors font-bold text-sm sm:text-base ${isRecording ? 'bg-red-500 text-white border-red-500 animate-pulse' : isDarkMode ? 'bg-white/5 border-white/10 text-red-500 hover:bg-white/10' : 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'}`}
+4506-                          title={isRecording ? "Stop recording" : "Record your pronunciation"}
+4507-                        >
+--
+4511-                        <button 
+4512-                          onClick={() => playPronunciation(result.word)}
+4513:                          className={`w-12 sm:w-14 h-12 sm:h-14 rounded-2xl border flex items-center justify-center transition-colors ${isSpeaking ? 'bg-[#10B981] text-white border-[#10B981]' : isDarkMode ? 'bg-white/5 border-white/10 text-emerald-400 hover:bg-white/10' : 'bg-[#F0FDF8] border-[#BDE8DB] text-[#10B981] hover:bg-[#E6F5F1]'}`}
+4514-                          title="Play pronunciation"
+4515-                        >
+--
+4520-                  </div>
+4521-                  <div className="flex flex-wrap gap-2 mt-6">
+4522:                    <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider ${isDarkMode ? 'bg-sky-900/30 text-sky-400' : 'bg-[#E0F2FE] text-[#0284C7]'}`}>
+4523-                      {result.partOfSpeech}
+4524-                    </div>
+4525-                    {result.difficultyLevel && (
+4526-                      <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider ${
+4527:                        result.difficultyLevel === 'Beginner' ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700') :
+4528:                        result.difficultyLevel === 'Intermediate' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700') :
+4529:                        (isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700')
+4530-                      }`}>
+4531-                        {result.difficultyLevel}
+--
+4537-              
+4538-              {userAudioUrl && (
+4539:                <div className={`mb-8 p-5 rounded-3xl border ${isDarkMode ? 'bg-indigo-950/20 border-indigo-500/20' : 'bg-indigo-50/50 border-indigo-100'}`}>
+4540-                  <div className="flex items-center justify-between mb-4">
+4541:                    <h4 className={`text-sm font-bold flex items-center gap-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+4542-                      <Mic className="w-4 h-4" /> Compare Pronunciation
+4543-                    </h4>
+4544-                    <button 
+4545-                      onClick={isRecording ? stopRecording : startRecording}
+4546:                      className={`text-xs font-medium px-3 py-1.5 rounded-xl transition-colors ${isRecording ? 'bg-red-500 text-white animate-pulse' : isDarkMode ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-white text-slate-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+4547-                    >
+4548-                      {isRecording ? "Stop Recording" : "Record Again"}
+--
+4550-                  </div>
+4551-                  <div className="flex flex-col sm:flex-row items-center gap-4">
+4552:                    <div className={`flex-1 w-full flex items-center justify-between p-4 rounded-2xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+4553-                      <div className="flex flex-col">
+4554:                        <span className={`text-xs font-bold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>Your Recording</span>
+4555:                        <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Listen back</span>
+4556-                      </div>
+4557:                      <button onClick={playRecording} className={`p-3 rounded-xl transition-colors ${isDarkMode ? 'bg-sky-900/30 text-sky-400 hover:bg-sky-900/50' : 'bg-sky-50 text-sky-600 hover:bg-sky-100'}`}>
+4558-                        <Play className="w-5 h-5" />
+4559-                      </button>
+4560-                    </div>
+4561-                    
+4562:                    <div className={`text-xs font-bold uppercase tracking-widest ${isDarkMode ? 'text-gray-600' : 'text-slate-300'}`}>
+4563-                      VS
+4564-                    </div>
+4565-                    
+4566:                    <div className={`flex-1 w-full flex items-center justify-between p-4 rounded-2xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+4567-                      <div className="flex flex-col">
+4568:                        <span className={`text-xs font-bold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>AI Voice</span>
+4569:                        <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Native speaker</span>
+4570-                      </div>
+4571:                      <button onClick={() => playPronunciation(result.word)} className={`p-3 rounded-xl transition-colors ${isSpeaking ? 'bg-[#10B981] text-white' : isDarkMode ? 'bg-emerald-900/30 text-emerald-400 hover:bg-emerald-900/50' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
+4572-                        <Volume2 className="w-5 h-5" />
+4573-                      </button>
+--
+4578-                    <div className="mt-4 flex items-center justify-center py-4 bg-indigo-500/10 rounded-xl">
+4579-                      <Loader2 className="w-5 h-5 animate-spin text-indigo-500 mr-2" />
+4580:                      <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">AI is analyzing your pronunciation...</span>
+4581-                    </div>
+4582-                  )}
+4583-                  {!isAnalyzingAudio && pronunciationScore && (
+4584:                    <div className={`mt-5 p-6 rounded-2xl border ${pronunciationScore.isCorrect ? (isDarkMode ? 'bg-emerald-950/40 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200') : (isDarkMode ? 'bg-amber-950/40 border-amber-500/30' : 'bg-amber-50 border-amber-200')} shadow-sm relative overflow-hidden text-left`}>
+4585-                      <div className={`absolute top-0 left-0 w-1 h-full ${pronunciationScore.isCorrect ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
+4586-                      
+--
+4588-                        <div className="flex items-center justify-between">
+4589-                          <div className="flex items-center gap-3">
+4590:                            <div className={`p-2 rounded-xl ${pronunciationScore.isCorrect ? (isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-200 text-emerald-700') : (isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-200 text-amber-700')}`}>
+4591-                              {pronunciationScore.isCorrect ? <CheckCircle className="w-6 h-6" /> : <Info className="w-6 h-6" />}
+4592-                            </div>
+4593:                            <h4 className={`text-lg md:text-xl font-bold font-outfit ${pronunciationScore.isCorrect ? (isDarkMode ? 'text-emerald-400' : 'text-emerald-700') : (isDarkMode ? 'text-amber-400' : 'text-amber-700')}`}>
+4594-                              {pronunciationScore.isCorrect ? "Great Job!" : "Keep Trying!"}
+4595-                            </h4>
+--
+4597-                          
+4598-                          <div className="flex items-baseline gap-1">
+4599:                            <span className={`text-3xl font-black font-outfit ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+4600-                              {pronunciationScore.score}
+4601-                            </span>
+4602:                            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>%</span>
+4603-                          </div>
+4604-                        </div>
+4605-
+4606:                        <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDarkMode ? 'bg-black/40' : 'bg-white/60'} shadow-inner`}>
+4607-                          <motion.div 
+4608-                            initial={{ width: 0 }}
+--
+4615-                        </div>
+4616-
+4617:                        <div className={`p-4 rounded-xl mt-1 flex flex-col gap-3 ${isDarkMode ? 'bg-white/5' : 'bg-white/60'} backdrop-blur-sm`}>
+4618-                          {pronunciationScore.phoneticTranscription && (
+4619-                            <div className="flex items-center gap-2">
+4620-                              <span className="text-xs font-bold uppercase tracking-wider text-emerald-500">You said:</span>
+4621:                              <span className={`font-mono text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>/{pronunciationScore.phoneticTranscription}/</span>
+4622-                            </div>
+4623-                          )}
+4624:                          <p className={`text-sm md:text-base font-medium leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>
+4625-                            {pronunciationScore.feedback}
+4626-                          </p>
+4627-                          {pronunciationScore.specificTips && pronunciationScore.specificTips.length > 0 && (
+4628-                            <div className="mt-2 text-sm">
+4629:                              <span className={`font-bold mb-2 block ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Improvement Tips:</span>
+4630-                              <ul className="list-disc pl-5 space-y-1">
+4631-                                {pronunciationScore.specificTips.map((tip: string, idx: number) => (
+4632:                                  <li key={idx} className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>{tip}</li>
+4633-                                ))}
+4634-                              </ul>
+--
+4646-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+4647-                {/* Bengali Meaning */}
+4648:                <div className={`rounded-3xl p-6 border transition-colors relative overflow-hidden ${isDarkMode ? 'bg-red-500/5 border-red-500/20' : 'bg-red-50 border-red-100'}`}>
+4649:                  <div className={`absolute -right-4 -top-8 opacity-[0.03] text-[10rem] font-black font-serif italic ${isDarkMode ? 'text-red-500' : 'text-red-900'} leading-none pointer-events-none select-none`}>
+4650-                    অA
+4651-                  </div>
+4652:                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2 relative z-10 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+4653-                    <span className="font-serif italic font-black text-base leading-none translate-y-[-1px]">অA</span> Bengali Meaning
+4654-                  </h4>
+4655-                  <div className="flex items-start justify-between gap-4 relative z-10">
+4656-                    <div>
+4657:                      <p className={`text-3xl md:text-4xl font-black font-outfit ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+4658-                        {result.bengaliMeaning}
+4659-                      </p>
+4660-                      <div className="flex items-center gap-2 mt-2">
+4661:                        <CopyButton text={result.bengaliMeaning} isDarkMode={isDarkMode} />
+4662-                      </div>
+4663-                    </div>
+4664-                    <button 
+4665-                      onClick={() => playBengaliPronunciation(result.bengaliMeaning)}
+4666:                      className={`p-3 rounded-full transition-colors shrink-0 ${isSpeaking ? 'bg-red-500/30 text-red-500 animate-pulse' : (isDarkMode ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-white shadow-sm text-red-500 hover:bg-red-50')}`}
+4667-                      title="Listen to Bengali Pronunciation"
+4668-                    >
+--
+4673-
+4674-                {/* English Definition */}
+4675:                <div className={`rounded-3xl p-6 border transition-colors relative overflow-hidden ${isDarkMode ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-100'}`}>
+4676:                  <div className={`absolute -right-4 -top-4 opacity-5 ${isDarkMode ? 'text-blue-500' : 'text-blue-900'}`}>
+4677-                    <BookOpen className="w-32 h-32" />
+4678-                  </div>
+4679-                  <div className="flex justify-between items-center mb-4">
+4680:                    <h4 className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+4681-                      <BookOpen className="w-4 h-4" /> Simple English Meaning
+4682-                    </h4>
+4683-                    <button
+4684-                      onClick={(e) => { e.stopPropagation(); playPronunciation(result.englishDefinition); }}
+4685:                      className={`p-2 rounded-full transition-all shrink-0 ${isSpeaking ? 'animate-pulse' : ''} ${isDarkMode ? 'hover:bg-blue-500/20 text-blue-400' : 'hover:bg-blue-200 text-blue-600'}`}
+4686-                      title="Listen to meaning directly"
+4687-                    >
+--
+4689-                    </button>
+4690-                  </div>
+4691:                  <p className={`text-xl font-medium leading-relaxed relative z-10 ${isDarkMode ? 'text-blue-200' : 'text-blue-900'}`}>
+4692-                    {result.englishDefinition}
+4693-                  </p>
+4694-                  {result.synonyms && result.synonyms.length > 0 && (
+4695-                    <div className="relative z-10 mt-6 pt-4 border-t border-blue-500/20">
+4696:                      <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDarkMode ? 'text-blue-400/70' : 'text-blue-600/70'}`}>Related Synonyms</p>
+4697-                      <div className="flex flex-wrap gap-2">
+4698-                        {result.synonyms.map((syn, idx) => (
+--
+4700-                            key={idx} 
+4701-                            onClick={(e) => { e.stopPropagation(); handleSearch(undefined, syn); }}
+4702:                            className={`px-3 py-1.5 rounded-lg text-sm font-bold cursor-pointer transition-colors ${isDarkMode ? 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/40' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+4703-                          >
+4704-                            {syn}
+--
+4713-              {/* Example Card */}
+4714-              {result.examples && result.examples.length > 0 ? (
+4715:                <div className={`rounded-3xl p-6 mb-4 border relative overflow-hidden ${isDarkMode ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
+4716-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] text-[20rem] leading-none pointer-events-none select-none">
+4717-                    🗣️
+4718-                  </div>
+4719:                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-5 flex items-center gap-2 relative z-10 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
+4720-                    <Quote className="w-4 h-4" /> Real-life Examples
+4721-                  </h4>
+--
+4723-                    {result.examples.map((ex, idx) => (
+4724-                      <div key={idx} className="flex gap-3">
+4725:                        <span className={`font-bold mt-0.5 shrink-0 ${isDarkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>{idx + 1}.</span>
+4726-                        <div className="flex flex-col gap-1.5 w-full">
+4727:                          {ex.context && <span className={`text-[10px] w-fit font-bold uppercase tracking-wider px-2 py-0.5 rounded-md mb-1 ${isDarkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-100 text-emerald-700'}`}>{ex.context}</span>}
+4728-                          <div className="flex items-start justify-between gap-2">
+4729:                            <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
+4730:                              &quot;{highlightWord(ex.english, result.word, isDarkMode)}&quot;
+4731-                            </p>
+4732:                            <CopyButton text={ex.english} isDarkMode={isDarkMode} />
+4733-                          </div>
+4734-                          <div className="flex items-center justify-between gap-2">
+4735:                            <p className={`text-sm font-medium flex-1 ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-700/80'}`}>
+4736-                              {ex.bengali}
+4737-                            </p>
+4738:                            <CopyButton text={ex.bengali} isDarkMode={isDarkMode} />
+4739-                          </div>
+4740-                        </div>
+--
+4744-                </div>
+4745-              ) : result.exampleSentences && result.exampleSentences.length > 0 ? (
+4746:                <div className={`rounded-3xl p-6 mb-4 border relative overflow-hidden ${isDarkMode ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
+4747-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] text-[20rem] leading-none pointer-events-none select-none">
+4748-                    🗣️
+4749-                  </div>
+4750-                  <div className="flex items-center justify-between mb-5 relative z-10">
+4751:                    <h4 className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
+4752-                      <Quote className="w-4 h-4" /> Real-life Examples
+4753-                    </h4>
+--
+4758-                        isTranslatingExamples 
+4759-                          ? 'opacity-50 cursor-not-allowed bg-emerald-100 text-emerald-500' 
+4760:                          : isDarkMode 
+4761-                            ? 'bg-emerald-900/40 text-emerald-300 hover:bg-emerald-900/60' 
+4762-                            : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+--
+4775-                    {result.exampleSentences.map((ex, idx) => (
+4776-                      <div key={idx} className="flex gap-3">
+4777:                        <span className={`font-bold mt-0.5 shrink-0 ${isDarkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>{idx + 1}.</span>
+4778-                        <div className="flex items-start justify-between gap-2 w-full">
+4779:                          <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
+4780:                            &quot;{highlightWord(ex, result.word, isDarkMode)}&quot;
+4781-                          </p>
+4782:                          <CopyButton text={ex} isDarkMode={isDarkMode} />
+4783-                        </div>
+4784-                      </div>
+--
+4787-                </div>
+4788-              ) : result.exampleSentence ? (
+4789:                <div className={`rounded-3xl p-6 mb-4 border flex flex-col gap-4 ${isDarkMode ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
+4790-                  <div className="flex items-center justify-between">
+4791:                    <h4 className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
+4792-                      <Quote className="w-4 h-4" /> Example
+4793-                    </h4>
+--
+4798-                        isTranslatingExamples 
+4799-                          ? 'opacity-50 cursor-not-allowed bg-emerald-100 text-emerald-500' 
+4800:                          : isDarkMode 
+4801-                            ? 'bg-emerald-900/40 text-emerald-300 hover:bg-emerald-900/60' 
+4802-                            : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+--
+4813-                  </div>
+4814-                  <div className="flex items-start justify-between gap-4 w-full">
+4815:                    <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
+4816:                      &quot;{highlightWord(result.exampleSentence, result.word, isDarkMode)}&quot;
+4817-                    </p>
+4818:                    <CopyButton text={result.exampleSentence} isDarkMode={isDarkMode} />
+4819-                  </div>
+4820-                </div>
+--
+4823-              {/* Speaking Tips Section */}
+4824-              {(result.speakingTips && result.speakingTips.length > 0) ? (
+4825:                <div className={`rounded-3xl p-6 mb-8 border relative overflow-hidden ${isDarkMode ? 'bg-amber-900/10 border-amber-900/30' : 'bg-amber-50 border-amber-100'}`}>
+4826-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] text-[20rem] leading-none pointer-events-none select-none">
+4827-                    🤺
+4828-                  </div>
+4829:                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-5 flex items-center gap-2 relative z-10 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+4830-                    <MessageCircle className="w-4 h-4" /> Speaking Tips
+4831-                  </h4>
+4832-                  <div className="flex flex-col gap-3 relative z-10">
+4833-                    {result.speakingTips.map((tip, idx) => (
+4834:                      <div key={idx} className={`p-4 rounded-xl border flex gap-3 text-left items-start transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+4835:                        <div className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center font-bold text-xs mt-0.5 ${isDarkMode ? 'bg-amber-900/50 text-amber-400' : 'bg-amber-100 text-amber-600'}`}>{idx + 1}</div>
+4836-                        <div className="flex flex-col gap-1 w-full">
+4837:                          <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-slate-700'}`}>{typeof tip === 'string' ? tip : tip.english}</p>
+4838-                          {typeof tip !== 'string' && tip.bengali && (
+4839:                            <p className={`text-sm font-medium mt-1 ${isDarkMode ? 'text-amber-400/80' : 'text-amber-700/80'}`}>{tip.bengali}</p>
+4840-                          )}
+4841-                        </div>
+--
+4845-                </div>
+4846-              ) : result.dailySpeakingTip && (
+4847:                <div className={`rounded-3xl p-6 mb-8 border flex gap-4 ${isDarkMode ? 'bg-amber-950/20 border-amber-500/20' : 'bg-amber-50 border-amber-100'}`}>
+4848:                  <Lightbulb className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
+4849:                  <p className={`text-base leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-slate-600'}`}>
+4850-                    <strong className="text-amber-500">Pro tip:</strong> {result.dailySpeakingTip}
+4851-                  </p>
+--
+4855-              {/* Related Words Section */}
+4856-              {result.relatedWords && result.relatedWords.length > 0 && (
+4857:                <div className={`rounded-3xl p-6 mb-8 border transition-colors relative overflow-hidden ${isDarkMode ? 'bg-indigo-500/5 border-indigo-500/20' : 'bg-indigo-50 border-indigo-100'}`}>
+4858:                  <div className={`absolute -right-4 -top-4 opacity-5 ${isDarkMode ? 'text-indigo-500' : 'text-indigo-900'}`}>
+4859-                    <Link className="w-32 h-32" />
+4860-                  </div>
+4861:                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+4862-                    <Link className="w-4 h-4" /> Related Words
+4863-                  </h4>
+4864:                  <p className={`text-sm mb-4 relative z-10 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-700'}`}>
+4865-                    Words commonly used together or semantically related to <strong>{result.word}</strong>:
+4866-                  </p>
+--
+4870-                        key={idx} 
+4871-                        onClick={(e) => { e.stopPropagation(); handleSearch(undefined, related); }}
+4872:                        className={`px-3 py-1.5 rounded-lg text-sm font-bold cursor-pointer transition-colors ${isDarkMode ? 'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/40' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'}`}
+4873-                      >
+4874-                        {related}
+--
+4891-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+4892-                    }}
+4893:                    className={`flex-1 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
+4894-                  >
+4895-                    View in Glossary <ArrowRight className="w-5 h-5" />
+--
+4897-                  <button 
+4898-                    onClick={toggleSaveWord}
+4899:                    className={`px-6 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white' : 'bg-gray-100 text-slate-600 hover:bg-gray-200 hover:text-slate-900 border border-gray-200'}`}
+4900-                    title="Remove from Vocabulary"
+4901-                  >
+--
+4914-              {isCurrentWordSaved && (
+4915-                <>
+4916:                  <div className={`mt-4 p-4 rounded-2xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+4917:                    <p className={`text-sm text-center mb-3 font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Review this word now to update its schedule:</p>
+4918-                    <div className="grid grid-cols-4 gap-2">
+4919-                      <button onClick={() => handleManualReview('Again')} className="py-2 rounded-xl text-xs font-bold bg-red-100 text-red-700 hover:bg-red-200">Again</button>
+--
+4927-                    const savedWord = savedWords.find(w => w.word.toLowerCase() === result.word.toLowerCase());
+4928-                    return savedWord ? (
+4929:                      <div className={`mt-4 p-4 rounded-2xl border space-y-4 ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+4930-                        <div>
+4931:                          <label className={`block text-xs font-bold mb-1 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Personal Notes</label>
+4932-                          <textarea 
+4933-                            value={savedWord.notes || ''}
+4934-                            onChange={(e) => updateSavedWordNotes(result.word, e.target.value)}
+4935-                            placeholder="Add your own notes, memory hooks, or examples..."
+4936:                            className={`w-full p-3 rounded-xl border text-sm focus:ring-2 focus:ring-[#10B981] outline-none resize-none h-20 ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-200 text-slate-800'}`}
+4937-                          />
+4938-                        </div>
+4939-                        <div>
+4940-                          <div className="flex justify-between items-center mb-1">
+4941:                            <label className={`block text-xs font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Custom Examples (one per line)</label>
+4942-                            <button 
+4943-                              onClick={() => generateExampleForWord(savedWord)}
+4944-                              disabled={isGeneratingExample}
+4945:                              className={`text-xs font-bold flex items-center gap-1 transition-colors ${isGeneratingExample ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'text-[#10B981] hover:text-[#34d399]' : 'text-[#10B981] hover:text-[#059669]'}`}
+4946-                            >
+4947:                              {isGeneratingExample ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Lightbulb className="w-3 h-3" />}
+4948-                              {isGeneratingExample ? 'Generating...' : 'Auto-Generate'}
+4949-                            </button>
+--
+4953-                            onChange={(e) => updateSavedWordExamples(result.word, e.target.value)}
+4954-                            placeholder="Add your own example sentences..."
+4955:                            className={`w-full p-3 rounded-xl border text-sm focus:ring-2 focus:ring-[#10B981] outline-none resize-none h-24 ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-200 text-slate-800'}`}
+4956-                          />
+4957-                        </div>
+4958-                        <div>
+4959-                          <div className="flex justify-between items-center mb-1">
+4960:                            <label className={`block text-xs font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Tags (comma separated)</label>
+4961-                            <button 
+4962-                              onClick={() => generateTagsForWord(savedWord)}
+4963-                              disabled={isGeneratingTags}
+4964:                              className={`text-xs font-bold flex items-center gap-1 transition-colors ${isGeneratingTags ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'text-[#10B981] hover:text-[#34d399]' : 'text-[#10B981] hover:text-[#059669]'}`}
+4965-                            >
+4966:                              {isGeneratingTags ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Lightbulb className="w-3 h-3" />}
+4967-                              {isGeneratingTags ? 'Generating...' : 'Auto-Generate'}
+4968-                            </button>
+--
+4973-                            onChange={(e) => updateSavedWordTags(result.word, e.target.value)}
+4974-                            placeholder="e.g., travel, important, verbs"
+4975:                            className={`w-full p-3 rounded-xl border text-sm focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-200 text-slate-800'}`}
+4976-                          />
+4977-                          {savedWord.tags && savedWord.tags.length > 0 && (
+4978-                            <div className="flex flex-wrap gap-2 mt-2">
+4979-                              {savedWord.tags.map((tag, idx) => (
+4980:                                <span key={idx} className={`text-[10px] px-2 py-1 rounded-md uppercase tracking-wider font-bold ${isDarkMode ? 'bg-emerald-950/50 text-emerald-400' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+4981-                                  {tag}
+4982-                                </span>
+--
+4994-          
+4995-          {/* Feedback Section */}
+4996:          <div className={`mt-8 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 ${isDarkMode ? 'border-white/10' : 'border-gray-200'}`}>
+4997-            {feedbackSubmitted ? (
+4998:              <div className={`flex items-center gap-2 text-sm font-medium mx-auto sm:mx-0 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+4999-                <CheckCircle className="w-5 h-5" /> Thank you for your feedback!
+5000-              </div>
+--
+5002-              <>
+5003-                <div className="flex items-center gap-3">
+5004:                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Was this helpful?</span>
+5005:                  <button onClick={() => setFeedbackSubmitted(true)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-gray-100 text-slate-600'}`}>
+5006-                    <ThumbsUp className="w-4 h-4" />
+5007-                  </button>
+5008:                  <button onClick={() => setFeedbackSubmitted(true)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-gray-100 text-slate-600'}`}>
+5009-                    <ThumbsDown className="w-4 h-4" />
+5010-                  </button>
+5011-                </div>
+5012:                <button onClick={() => setFeedbackSubmitted(true)} className={`flex items-center gap-2 text-sm font-medium transition-colors ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}>
+5013-                  <Flag className="w-4 h-4" /> Report an issue
+5014-                </button>
+--
+5023-      <div className="w-full max-w-2xl mx-auto px-4 py-16 mt-auto">
+5024-        <div className="flex items-center justify-center gap-4 mb-10">
+5025:          <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+5026:          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+5027-            <Bookmark className="w-6 h-6" />
+5028-          </div>
+5029:          <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+5030-        </div>
+5031-        
+5032-        <div className="text-center mb-10">
+5033:          <h2 className={`text-4xl font-outfit font-extrabold mb-3 text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>My <span className="text-[#10B981]">Saved</span> Vocabulary</h2>
+5034:          <p className={`text-base mb-6 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>{savedWords.length} words saved</p>
+5035-          
+5036-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 flex-wrap">
+--
+5046-                    key={level}
+5047-                    onClick={() => setDifficultyFilter(level as any)}
+5048:                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors ${difficultyFilter === level ? `${activeBgColor} text-white` : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white' : 'bg-gray-100 text-slate-600 hover:bg-gray-200 hover:text-slate-900'}`}
+5049-                  >
+5050-                    {level === 'All' ? 'All Levels' : level}
+--
+5060-                className={`px-4 py-2 rounded-xl text-sm font-bold outline-none border transition-colors sm:max-w-[150px] truncate ${
+5061-                  selectedTagFilter !== 'All'
+5062:                    ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+5063:                    : (isDarkMode ? 'bg-[#111] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+5064-                }`}
+5065-              >
+--
+5073-        </div>
+5074-        
+5075:        <div className={`rounded-[2.5rem] shadow-sm border p-8 md:p-12 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+5076-          {savedWords.length === 0 ? (
+5077-            <div className="flex flex-col items-center justify-center text-center py-8">
+5078:              <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center mb-6 ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#F0FDF8] text-[#10B981]'}`}>
+5079-                <Bookmark className="w-10 h-10" />
+5080-              </div>
+5081:              <p className={`font-medium text-lg ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>No words saved yet</p>
+5082-            </div>
+5083-          ) : (
+--
+5085-              {filteredSavedWords.length === 0 ? (
+5086-                <div className="col-span-1 sm:col-span-2 text-center py-8">
+5087:                  <p className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>No words match your current filters.</p>
+5088-                </div>
+5089-              ) : (
+--
+5092-                    key={idx}
+5093-                    onClick={() => handleSearch(undefined, item.word)}
+5094:                    className={`p-4 rounded-2xl border transition-all cursor-pointer group flex justify-between items-center ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 hover:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 hover:bg-[#F0FDF8]'}`}
+5095-                  >
+5096-                    <div className="flex items-center gap-4">
+5097-                      <div>
+5098:                        <h4 className={`font-bold text-lg transition-colors flex items-center gap-2 ${isDarkMode ? 'text-gray-200 group-hover:text-[#10B981]' : 'text-slate-800 group-hover:text-[#10B981]'}`}>
+5099-                          {item.word}
+5100-                          {item.difficultyLevel && (
+--
+5108-                          )}
+5109-                        </h4>
+5110:                        <div className={`text-sm mt-1 flex items-center gap-1.5 ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+5111-                          <span>{item.bengaliMeaning}</span>
+5112-                          <button 
+5113-                            onClick={(e) => { e.stopPropagation(); playBengaliPronunciation(item.bengaliMeaning); }}
+5114:                            className={`p-1 rounded-full transition-colors ${isSpeaking ? 'text-red-500' : isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-red-400' : 'text-slate-400 hover:bg-gray-100 hover:text-red-500'}`}
+5115-                            title="Play Bengali Pronunciation"
+5116-                          >
+--
+5121-                          <div className="flex flex-wrap gap-1 mt-2">
+5122-                            {item.tags.map((tag, tIdx) => (
+5123:                              <span key={tIdx} className={`text-[10px] flex items-center gap-1 font-bold px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+5124-                                <Tag className="w-2.5 h-2.5" /> {tag}
+5125-                              </span>
+--
+5128-                        )}
+5129-                        {(item.notes || (item.customExamples && item.customExamples.length > 0)) && (
+5130:                          <div className={`mt-3 pt-3 border-t flex flex-col gap-2 ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+5131-                            {item.notes && (
+5132:                              <div className={`text-xs italic ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+5133-                                📝 {item.notes}
+5134-                              </div>
+--
+5137-                              <div className="flex flex-col gap-1">
+5138-                                {item.customExamples.map((ex, exIdx) => (
+5139:                                  <div key={exIdx} className={`text-xs flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+5140-                                    <span className="opacity-70">&bull;</span> {ex}
+5141-                                  </div>
+--
+5147-                      </div>
+5148-                    </div>
+5149:                    <ArrowRight className={`w-5 h-5 shrink-0 ml-4 transition-colors ${isDarkMode ? 'text-gray-600 group-hover:text-[#10B981]' : 'text-gray-300 group-hover:text-[#10B981]'}`} />
+5150-                  </div>
+5151-                ))
+--
+5172-              animate={{ scale: 1, opacity: 1 }}
+5173-              exit={{ scale: 0.95, opacity: 0 }}
+5174:              className={`w-full max-w-sm rounded-[2rem] p-6 shadow-2xl border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+5175-            >
+5176:              <div className={`w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-red-500/10 text-red-500' : 'bg-red-50 text-red-600'}`}>
+5177-                <AlertTriangle className="w-8 h-8" />
+5178-              </div>
+5179:              <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Clear Search History?</h3>
+5180:              <p className={`text-sm mb-6 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+5181-                Are you sure you want to delete all your search history? This action cannot be undone.
+5182-              </p>
+--
+5184-                <button
+5185-                  onClick={() => setShowClearHistoryDialog(false)}
+5186:                  className={`flex-1 py-3 rounded-xl font-bold transition-colors ${isDarkMode ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-gray-100 text-slate-700 hover:bg-gray-200'}`}
+5187-                >
+5188-                  Cancel
+--
+5219-              animate={{ opacity: 1, scale: 1, y: 0 }}
+5220-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+5221:              className={`w-full max-w-lg p-6 sm:p-8 rounded-3xl shadow-xl border overflow-y-auto max-h-[90vh] ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
+5222-            >
+5223-              <div className="flex justify-between items-center mb-6">
+5224-                <div>
+5225:                  <h3 className={`font-outfit text-2xl font-bold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+5226-                    <Settings className="w-6 h-6 text-emerald-500" /> Quiz Settings
+5227-                  </h3>
+5228:                  <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Customize your vocabulary quiz</p>
+5229-                </div>
+5230-                <button
+5231-                  onClick={() => setShowQuizSettings(false)}
+5232:                  className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+5233-                >
+5234-                  <X className="w-5 h-5" />
+--
+5238-              <div className="space-y-6">
+5239-                <div>
+5240:                  <label className={`block text-sm font-bold mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Questions Per Quiz</label>
+5241-                  <div className="flex flex-wrap gap-2">
+5242-                    {[5, 10, 15, 20].map(count => (
+--
+5247-                          quizSettings.questionCount === count 
+5248-                            ? 'bg-[#10B981] text-white shadow-md shadow-[#10B981]/30' 
+5249:                            : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+5250-                        }`}
+5251-                      >
+--
+5257-
+5258-                <div>
+5259:                  <label className={`block text-sm font-bold mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Time Limit Per Question</label>
+5260-                  <div className="grid grid-cols-2 gap-2">
+5261-                    {([0, 10, 15, 30] as const).map(limit => (
+--
+5266-                          quizSettings.timeLimitSeconds === limit 
+5267-                            ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30' 
+5268:                            : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+5269-                        }`}
+5270-                      >
+--
+5276-
+5277-                <div>
+5278:                  <label className={`block text-sm font-bold mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Question Types</label>
+5279-                  <div className="flex flex-col gap-2">
+5280:                    <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}>
+5281-                      <div className="flex items-center gap-3">
+5282:                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-indigo-900/30 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
+5283-                          <Book className="w-5 h-5" />
+5284-                        </div>
+5285-                        <div className="flex flex-col">
+5286:                          <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Bengali Meaning</span>
+5287:                          <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Translate words between English & Bengali</span>
+5288-                        </div>
+5289-                      </div>
+--
+5295-                          onChange={(e) => setQuizSettings({...quizSettings, types: {...quizSettings.types, meaning: e.target.checked}})}
+5296-                        />
+5297:                        <div className={`w-6 h-6 rounded-full transition-colors flex items-center justify-center ${quizSettings.types.meaning ? 'bg-[#10B981]' : isDarkMode ? 'bg-gray-800 border-2 border-gray-600' : 'bg-white border-2 border-gray-300'}`}>
+5298-                          {quizSettings.types.meaning && <CheckCircle className="w-4 h-4 text-white" />}
+5299-                        </div>
+--
+5301-                    </label>
+5302-
+5303:                    <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}>
+5304-                      <div className="flex items-center gap-3">
+5305:                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-amber-900/30 text-amber-400' : 'bg-amber-100 text-amber-600'}`}>
+5306-                          <Volume2 className="w-5 h-5" />
+5307-                        </div>
+5308-                        <div className="flex flex-col">
+5309:                          <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Pronunciation Match</span>
+5310:                          <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Identify the word by its audio</span>
+5311-                        </div>
+5312-                      </div>
+--
+5318-                          onChange={(e) => setQuizSettings({...quizSettings, types: {...quizSettings.types, pronunciation: e.target.checked}})}
+5319-                        />
+5320:                        <div className={`w-6 h-6 rounded-full transition-colors flex items-center justify-center ${quizSettings.types.pronunciation ? 'bg-[#10B981]' : isDarkMode ? 'bg-gray-800 border-2 border-gray-600' : 'bg-white border-2 border-gray-300'}`}>
+5321-                          {quizSettings.types.pronunciation && <CheckCircle className="w-4 h-4 text-white" />}
+5322-                        </div>
+--
+5324-                    </label>
+5325-
+5326:                    <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}>
+5327-                      <div className="flex items-center gap-3">
+5328:                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-sky-900/30 text-sky-400' : 'bg-sky-100 text-sky-600'}`}>
+5329-                          <FileText className="w-5 h-5" />
+5330-                        </div>
+5331-                        <div className="flex flex-col">
+5332:                          <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Examples</span>
+5333:                          <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Fill in the blanks with target words</span>
+5334-                        </div>
+5335-                      </div>
+--
+5341-                          onChange={(e) => setQuizSettings({...quizSettings, types: {...quizSettings.types, example: e.target.checked}})}
+5342-                        />
+5343:                        <div className={`w-6 h-6 rounded-full transition-colors flex items-center justify-center ${quizSettings.types.example ? 'bg-[#10B981]' : isDarkMode ? 'bg-gray-800 border-2 border-gray-600' : 'bg-white border-2 border-gray-300'}`}>
+5344-                          {quizSettings.types.example && <CheckCircle className="w-4 h-4 text-white" />}
+5345-                        </div>
+--
+5350-              </div>
+5351-
+5352:              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/10 flex gap-3">
+5353-                <button
+5354-                  onClick={() => setShowQuizSettings(false)}
+5355:                  className={`flex-1 py-3 rounded-xl font-bold transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
+5356-                >
+5357-                  Done
+--
+5376-              animate={{ scale: 1, opacity: 1 }}
+5377-              exit={{ scale: 0.95, opacity: 0 }}
+5378:              className={`w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+5379-            >
+5380-              <div className="flex justify-between items-center mb-6">
+5381:                <h3 className={`text-2xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Settings</h3>
+5382-                <button 
+5383-                  onClick={() => setShowSrsSettings(false)}
+5384:                  className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+5385-                >
+5386-                  <X className="w-5 h-5" />
+--
+5391-                {/* General Settings */}
+5392-                <div className="space-y-4">
+5393:                  <h4 className={`text-lg font-bold border-b pb-2 ${isDarkMode ? 'text-white border-white/10' : 'text-slate-800 border-gray-100'}`}>Learning Goals & Reminders</h4>
+5394-                  
+5395-                  <div>
+5396:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5397-                      Daily Goal (number of reviews/words)
+5398-                      <div className="relative group">
+5399-                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5400:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5401-                          Set a target for how many words you want to review or learn each day. Your progress will be tracked in the dashboard.
+5402-                        </div>
+--
+5411-                        setUserStats(prev => ({...prev, dailyGoal: newGoal}));
+5412-                      }}
+5413:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5414-                    />
+5415-                  </div>
+5416-                  
+5417-                  <div className="flex items-center justify-between pt-2">
+5418:                    <label className={`flex items-center gap-2 text-sm font-bold ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5419-                      Daily Study Reminders
+5420-                      <div className="relative group">
+5421-                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5422:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5423-                          Enable to get a browser notification or in-app reminder when you have words due for review.
+5424-                        </div>
+--
+5433-                        }
+5434-                      }}
+5435:                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${userStats.dailyReminders ? 'bg-[#10B981]' : (isDarkMode ? 'bg-gray-700' : 'bg-gray-300')}`}
+5436-                    >
+5437-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${userStats.dailyReminders ? 'translate-x-6' : 'translate-x-1'}`} />
+--
+5442-                {/* Text-to-Speech (TTS) Settings */}
+5443-                <div className="space-y-4">
+5444:                  <h4 className={`text-lg font-bold border-b pb-2 ${isDarkMode ? 'text-white border-white/10' : 'text-slate-800 border-gray-100'}`}>Text-to-Speech (TTS) Settings</h4>
+5445-                  
+5446-                  <div>
+5447:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5448-                      TTS Engine
+5449-                      <div className="relative group">
+5450-                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5451:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5452-                          Standard uses your device&apos;s built-in voices (fast, works offline). Advanced uses Gemini AI for highly natural, expressive pronunciation (requires internet).
+5453-                        </div>
+--
+5457-                      <button
+5458-                        onClick={() => setTtsEngine('browser')}
+5459:                        className={`flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-colors ${ttsEngine === 'browser' ? 'bg-[#10B981] text-white' : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+5460-                      >
+5461-                        Standard (Browser)
+--
+5463-                      <button
+5464-                        onClick={() => setTtsEngine('gemini')}
+5465:                        className={`flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-colors ${ttsEngine === 'gemini' ? 'bg-[#10B981] text-white' : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+5466-                      >
+5467-                        Advanced (Gemini)
+--
+5473-                    <>
+5474-                      <div>
+5475:                        <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5476-                          Advanced Voice
+5477-                          <div className="relative group">
+5478-                            <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5479:                            <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5480-                              Choose from different high-quality AI voices provided by Gemini. Each has a distinct tone and personality.
+5481-                            </div>
+--
+5485-                          value={geminiVoice}
+5486-                          onChange={(e) => setGeminiVoice(e.target.value)}
+5487:                          className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5488-                        >
+5489-                          <option value="Kore">Kore (Female)</option>
+--
+5495-                      </div>
+5496-                      <div>
+5497:                        <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5498-                          Regional Accent
+5499-                          <div className="relative group">
+5500-                            <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5501:                            <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5502-                              Adjusts the pronunciation rules to match specific English dialects. Note: This directs the AI, but results may vary based on the selected voice.
+5503-                            </div>
+--
+5507-                          value={geminiAccent}
+5508-                          onChange={(e) => setGeminiAccent(e.target.value)}
+5509:                          className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5510-                        >
+5511-                          <option value="US English">US English</option>
+--
+5520-                  ) : (
+5521-                    <div>
+5522:                      <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5523-                        Browser Voice
+5524-                        <div className="relative group">
+5525-                          <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5526:                          <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5527-                            Select from the available browser voices installed on your device or browser. Options vary by device.
+5528-                          </div>
+--
+5532-                        value={selectedVoiceURI}
+5533-                        onChange={(e) => setSelectedVoiceURI(e.target.value)}
+5534:                        className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5535-                      >
+5536-                        <option value="">Default Browser Voice</option>
+--
+5545-
+5546-                  <div>
+5547:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5548-                      Speech Rate: {speechRate.toFixed(1)}x
+5549-                      <div className="relative group">
+5550-                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5551:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5552-                          How fast the words are spoken. Slower speeds (0.8x) are highly recommended for practicing listening comprehension.
+5553-                        </div>
+--
+5563-                      className="w-full accent-[#10B981]"
+5564-                    />
+5565:                    <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+5566-                      <span>Slower</span>
+5567-                      <span>Normal</span>
+--
+5573-                {/* SRS Settings */}
+5574-                <div className="space-y-4">
+5575:                  <h4 className={`text-lg font-bold border-b pb-2 ${isDarkMode ? 'text-white border-white/10' : 'text-slate-800 border-gray-100'}`}>Spaced Repetition (SRS)</h4>
+5576-                  
+5577-                  <div>
+5578:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5579-                      Base Interval (days)
+5580-                      <div className="relative group">
+5581-                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5582:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5583-                          The time in days until the next review if you mark a new word as &quot;Good&quot;. If you mark a word as &quot;Again&quot;, it resets to this interval.
+5584-                        </div>
+--
+5590-                      value={srsSettings.baseInterval}
+5591-                      onChange={(e) => setSrsSettings({...srsSettings, baseInterval: parseInt(e.target.value) || 1})}
+5592:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5593-                    />
+5594-                  </div>
+5595-
+5596-                  <div>
+5597:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5598-                      Second Interval (days)
+5599-                      <div className="relative group">
+5600-                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5601:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5602-                          The time in days until the next review after you successfully remember a word for the second time in a row.
+5603-                        </div>
+--
+5609-                      value={srsSettings.secondInterval}
+5610-                      onChange={(e) => setSrsSettings({...srsSettings, secondInterval: parseInt(e.target.value) || 1})}
+5611:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5612-                    />
+5613-                  </div>
+5614-
+5615-                  <div>
+5616:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5617-                      Starting Ease Factor
+5618-                      <div className="relative group">
+5619-                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5620:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5621-                          A multiplier that determines how quickly the review intervals grow. A higher number means the intervals will increase faster (you&apos;ll see the word less often). Default is 2.5.
+5622-                        </div>
+--
+5629-                      value={srsSettings.startingEase}
+5630-                      onChange={(e) => setSrsSettings({...srsSettings, startingEase: parseFloat(e.target.value) || 2.5})}
+5631:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5632-                    />
+5633-                  </div>
+5634-
+5635-                  <div>
+5636:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5637-                      Learned Threshold (days)
+5638-                      <div className="relative group">
+5639-                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+5640:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5641-                          When a word&apos;s next review interval reaches this many days, it is considered fully &quot;Learned&quot; and will contribute to your Learned Words statistic.
+5642-                        </div>
+--
+5648-                      value={srsSettings.learnedThreshold}
+5649-                      onChange={(e) => setSrsSettings({...srsSettings, learnedThreshold: parseInt(e.target.value) || 21})}
+5650:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5651-                    />
+5652-                  </div>
+--
+5680-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+5681-              onClick={(e) => e.stopPropagation()}
+5682:              className={`w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+5683-            >
+5684-              <div className="flex justify-between items-start mb-6">
+5685:                <div className={`w-16 h-16 rounded-[2rem] flex items-center justify-center ${isDarkMode ? selectedFeatureDetails.darkBgClass + ' ' + selectedFeatureDetails.darkColorClass : selectedFeatureDetails.bgClass + ' ' + selectedFeatureDetails.colorClass}`}>
+5686-                  {selectedFeatureDetails.icon}
+5687-                </div>
+5688-                <button 
+5689-                  onClick={() => setSelectedFeatureDetails(null)}
+5690:                  className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+5691-                >
+5692-                  <X className="w-6 h-6" />
+--
+5694-              </div>
+5695-
+5696:              <h3 className={`text-3xl font-outfit font-extrabold mb-6 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+5697-                {selectedFeatureDetails.title}
+5698-              </h3>
+--
+5700-              <div className="space-y-6">
+5701-                <div>
+5702:                  <h4 className={`text-sm font-bold tracking-widest uppercase mb-4 flex items-center gap-2 ${isDarkMode ? selectedFeatureDetails.darkColorClass : selectedFeatureDetails.colorClass}`}>
+5703-                    ⚙️ What It Does
+5704-                  </h4>
+5705-                  <ul className="space-y-3">
+5706-                    {selectedFeatureDetails.whatItDoes.map((item, index) => (
+5707:                      <li key={index} className={`text-lg leading-relaxed flex items-start gap-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5708-                        <span>{item}</span>
+5709-                      </li>
+--
+5713-
+5714-                <div>
+5715:                  <h4 className={`text-sm font-bold tracking-widest uppercase mb-4 flex items-center gap-2 ${isDarkMode ? selectedFeatureDetails.darkColorClass : selectedFeatureDetails.colorClass}`}>
+5716-                    🌟 Why You Need It
+5717-                  </h4>
+5718-                  <ul className="space-y-3">
+5719-                    {selectedFeatureDetails.whyYouNeedIt.map((item, index) => (
+5720:                      <li key={index} className={`text-lg leading-relaxed flex items-start gap-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5721-                        <span>{item}</span>
+5722-                      </li>
+--
+5728-              <button 
+5729-                onClick={() => setSelectedFeatureDetails(null)}
+5730:                className={`w-full mt-8 py-4 rounded-xl font-bold transition-colors ${isDarkMode ? selectedFeatureDetails.darkBgClass + ' ' + selectedFeatureDetails.darkColorClass + ' hover:bg-white/10' : selectedFeatureDetails.bgClass + ' ' + selectedFeatureDetails.colorClass + ' hover:brightness-95'}`}
+5731-              >
+5732-                Got it
+--
+5744-            animate={{ opacity: 1, y: 0, scale: 1 }}
+5745-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+5746:            className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl z-[100] font-medium flex items-center gap-3 backdrop-blur-md ${isDarkMode ? 'bg-emerald-900/90 text-emerald-100 border border-emerald-500/30' : 'bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-emerald-500/20'}`}
+5747-          >
+5748-            <CheckCircle className="w-5 h-5 flex-shrink-0" />

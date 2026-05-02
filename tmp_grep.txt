@@ -1,0 +1,49 @@
+369-  const [showMobileMenu, setShowMobileMenu] = useState(false);
+370-  const [showClearHistoryDialog, setShowClearHistoryDialog] = useState(false);
+371-  const [showGlossary, setShowGlossary] = useState(false);
+372-  const [glossarySearchQuery, setGlossarySearchQuery] = useState('');
+373-  const [showDashboard, setShowDashboard] = useState(false);
+374:  const [showTranslator, setShowTranslator] = useState(false);
+375-  const [translationInput, setTranslationInput] = useState("");
+376-  const [translationOutput, setTranslationOutput] = useState("");
+377-  const [isTranslating, setIsTranslating] = useState(false);
+378-  const [isTranslatingExamples, setIsTranslatingExamples] = useState(false);
+379-  const [showQuiz, setShowQuiz] = useState(false);
+--
+2330-          >
+2331-            <Gamepad2 className="w-6 h-6" />
+2332-          </button>
+2333-          <button 
+2334-            onClick={() => {
+2335:              setShowTranslator(!showTranslator);
+2336:              if (!showTranslator) {
+2337-                setShowHistory(false);
+2338-                setShowGlossary(false);
+2339-                setShowDashboard(false);
+2340-                setShowQuiz(false);
+2341-                setShowQuizSettings(false);
+--
+2473-              <span className="font-medium">Vocabulary Quiz</span>
+2474-            </button>
+2475-            <button 
+2476-              onClick={() => {
+2477-                setShowMobileMenu(false);
+2478:                setShowTranslator(!showTranslator);
+2479:                if (!showTranslator) {
+2480-                  setShowHistory(false);
+2481-                  setShowGlossary(false);
+2482-                  setShowDashboard(false);
+2483-                  setShowQuiz(false);
+2484-                  setShowQuizSettings(false);
+--
+2911-                </div>
+2912-              </motion.div>
+2913-            )}
+2914-          </div>
+2915-        </div>
+2916:      ) : showTranslator ? (
+2917-        <div className="w-full max-w-3xl mx-auto px-4 py-8 flex-1">
+2918-          <div className="flex items-center justify-between mb-8">
+2919-            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+2920-              AI <span className="text-[#10B981]">Translator</span>
+2921-            </h2>

@@ -7,7 +7,7 @@ export const syncSavedWordsToFirestore = async (userId: string, savedWords: any[
     const wordsRef = collection(db, `users/${userId}/savedWords`);
     
     // Get existing words first to delete the ones removed locally
-    const existingQ = query(wordsRef, limit(2000));
+    const existingQ = query(wordsRef);
     const snapshot = await getDocs(existingQ);
     const existingIds = new Set(snapshot.docs.map(doc => doc.id));
     
@@ -38,7 +38,7 @@ export const syncSavedWordsToFirestore = async (userId: string, savedWords: any[
 export const fetchSavedWordsFromFirestore = async (userId: string) => {
   try {
     const wordsRef = collection(db, `users/${userId}/savedWords`);
-    const q = query(wordsRef, limit(2000));
+    const q = query(wordsRef);
     const snapshot = await getDocs(q);
     
     const words: any[] = [];

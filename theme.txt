@@ -1,0 +1,4 @@
+447:      return localStorage.getItem('learnEnglishEasy_theme') === 'dark';
+531:  // Load saved words, history, and theme on mount
+765:  // Save theme to localStorage and update document.documentElement when updated
+767:    localStorage.setItem('learnEnglishEasy_theme', isDarkMode ? 'dark' : 'light');

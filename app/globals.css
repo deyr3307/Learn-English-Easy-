@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-luckiest-guy), ui-sans-serif, system-ui, sans-serif;
   --font-outfit: var(--font-luckiest-guy), ui-sans-serif, system-ui, sans-serif;

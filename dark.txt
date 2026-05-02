@@ -1,0 +1,514 @@
+77:const highlightWord = (text: string, targetWord: string, isDarkMode: boolean) => {
+86:          <span key={i} className={`font-bold px-1 rounded ${isDarkMode ? 'text-emerald-300 bg-emerald-900/40' : 'text-emerald-700 bg-emerald-200/50'}`}>{part}</span> : 
+251:const CopyButton = ({ text, isDarkMode }: { text: string; isDarkMode: boolean }) => {
+268:      className={`p-1.5 rounded-lg transition-all shrink-0 ${isDarkMode ? 'hover:bg-white/10 text-gray-400 hover:text-emerald-400' : 'hover:bg-gray-100 text-slate-400 hover:text-emerald-600'}`}
+445:  const [isDarkMode, setIsDarkMode] = useState(() => {
+767:    localStorage.setItem('learnEnglishEasy_theme', isDarkMode ? 'dark' : 'light');
+768:    if (isDarkMode) {
+773:  }, [isDarkMode]);
+2313:    <div className={`min-h-screen flex flex-col w-full overflow-x-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#0a0a0a] text-gray-100' : 'bg-gradient-to-b from-[#E6F7F2] via-[#F0FDF8] to-[#F8FAFC] text-slate-800'}`}>
+2321:          <Leaf className={`w-8 h-8 sm:w-10 sm:h-10 ${isDarkMode ? 'text-[#10B981]' : 'text-[#064E3B]'}`} />
+2327:            onClick={() => setIsDarkMode(!isDarkMode)}
+2328:            className={`relative w-16 h-8 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-500 overflow-hidden ${isDarkMode ? 'bg-slate-700' : 'bg-sky-100 border border-sky-200/50'}`}
+2333:              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`}>
+2336:              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`}>
+2342:            <div className={`relative w-6 h-6 rounded-full shadow-sm flex items-center justify-center transition-all duration-500 z-10 ${isDarkMode ? 'translate-x-8 bg-slate-800 border border-slate-600' : 'translate-x-0 bg-white border border-slate-100'}`}>
+2343:              <Moon className={`absolute w-3.5 h-3.5 text-emerald-400 transition-all duration-500 ${isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} />
+2344:              <Sun className={`absolute w-3.5 h-3.5 text-amber-500 transition-all duration-500 ${isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} />
+2360:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2377:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2394:            className={`relative p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2414:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2423:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2440:            className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
+2450:            onClick={() => setIsDarkMode(!isDarkMode)}
+2451:            className={`relative w-14 h-7 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-500 overflow-hidden ${isDarkMode ? 'bg-slate-700' : 'bg-sky-100 border border-sky-200/50'}`}
+2456:              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`}>
+2459:              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`}>
+2465:            <div className={`relative w-5 h-5 rounded-full shadow-sm flex items-center justify-center transition-all duration-500 z-10 ${isDarkMode ? 'translate-x-7 bg-slate-800 border border-slate-600' : 'translate-x-0 bg-white border border-slate-100'}`}>
+2466:              <Moon className={`absolute w-3 h-3 text-emerald-400 transition-all duration-500 ${isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} />
+2467:              <Sun className={`absolute w-3 h-3 text-amber-500 transition-all duration-500 ${isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} />
+2472:            className={`p-2 rounded-xl transition-colors ${isDarkMode ? 'bg-white/5 text-gray-200 hover:bg-white/10' : 'bg-white shadow-sm text-slate-800 hover:bg-gray-50'}`}
+2486:            className={`md:hidden absolute top-[72px] left-4 right-4 z-40 rounded-2xl p-4 shadow-xl border overflow-hidden flex flex-col gap-2 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+2502:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2520:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2538:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2561:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2571:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2589:              className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
+2621:            <div className={`p-4 rounded-xl flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm border-l-4 ${isDarkMode ? 'bg-slate-800/80 border-[#10B981]' : 'bg-white border-[#10B981]'} `}>
+2623:                <div className={`p-3 rounded-full shrink-0 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-600'}`}>
+2627:                  <h3 className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Time for your daily review!</h3>
+2628:                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-600'}`}>
+2657:                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+2681:                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+2696:            <h2 className={`text-2xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+2706:              className={`text-sm underline ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+2712:          <div className={`w-full rounded-[2.5rem] shadow-sm border p-8 md:p-12 text-center flex flex-col items-center min-h-[400px] justify-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+2714:              <h3 className={`text-5xl md:text-6xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-[#10B981]' : 'text-[#10B981]'}`}>
+2724:                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${isRecording ? 'bg-red-500 text-white border-red-500 animate-pulse' : isDarkMode ? 'bg-white/5 border-white/10 text-red-400 hover:bg-white/10' : 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'}`}
+2731:                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${isSpeaking ? 'bg-[#10B981] text-white border-[#10B981]' : isDarkMode ? 'bg-white/5 border-white/10 text-emerald-400 hover:bg-white/10' : 'bg-[#F0FDF8] border-[#BDE8DB] text-[#10B981] hover:bg-[#E6F5F1]'}`}
+2741:              <div className={`w-full max-w-md mx-auto mb-6 p-4 rounded-2xl border ${isDarkMode ? 'bg-indigo-950/20 border-indigo-500/20' : 'bg-indigo-50/50 border-indigo-100'}`}>
+2743:                  <h4 className={`text-sm font-bold flex items-center gap-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+2748:                    className={`text-xs font-medium px-2 py-1 rounded-lg transition-colors ${isRecording ? 'bg-red-500 text-white animate-pulse' : isDarkMode ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-white text-slate-600 hover:bg-gray-100 border border-gray-200'}`}
+2754:                  <div className={`flex-1 flex items-center justify-between p-3 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+2755:                    <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>You</span>
+2756:                    <button onClick={playRecording} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'bg-sky-900/30 text-sky-400 hover:bg-sky-900/50' : 'bg-sky-50 text-sky-600 hover:bg-sky-100'}`}>
+2761:                  <div className={`text-xs font-bold uppercase ${isDarkMode ? 'text-gray-600' : 'text-slate-400'}`}>
+2765:                  <div className={`flex-1 flex items-center justify-between p-3 rounded-xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+2766:                    <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>AI</span>
+2767:                    <button onClick={() => playPronunciation(currentReviewWord.word)} className={`p-2 rounded-lg transition-colors ${isSpeaking ? 'bg-[#10B981] text-white' : isDarkMode ? 'bg-emerald-900/30 text-emerald-400 hover:bg-emerald-900/50' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
+2780:                  <div className={`mt-5 p-6 rounded-2xl border ${pronunciationScore.isCorrect ? (isDarkMode ? 'bg-emerald-950/40 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200') : (isDarkMode ? 'bg-amber-950/40 border-amber-500/30' : 'bg-amber-50 border-amber-200')} shadow-sm relative overflow-hidden text-left`}>
+2786:                          <div className={`p-2 rounded-xl ${pronunciationScore.isCorrect ? (isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-200 text-emerald-700') : (isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-200 text-amber-700')}`}>
+2789:                          <h4 className={`text-lg md:text-xl font-bold font-outfit ${pronunciationScore.isCorrect ? (isDarkMode ? 'text-emerald-400' : 'text-emerald-700') : (isDarkMode ? 'text-amber-400' : 'text-amber-700')}`}>
+2795:                          <span className={`text-3xl font-black font-outfit ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+2798:                          <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>%</span>
+2802:                      <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDarkMode ? 'bg-black/40' : 'bg-white/60'} shadow-inner`}>
+2813:                      <div className={`p-4 rounded-xl mt-1 flex flex-col gap-3 ${isDarkMode ? 'bg-white/5' : 'bg-white/60'} backdrop-blur-sm`}>
+2817:                            <span className={`font-mono text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>/{pronunciationScore.phoneticTranscription}/</span>
+2820:                        <p className={`text-sm md:text-base font-medium leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>
+2825:                            <span className={`font-bold mb-2 block ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Improvement Tips:</span>
+2828:                                <li key={idx} className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>{tip}</li>
+2851:                  className={`absolute w-full h-full rounded-[3rem] shadow-lg border flex flex-col items-center justify-center p-8 bg-gradient-to-br transition-shadow ${isDarkMode ? 'from-[#1A1A1A] to-[#111] border-white/10' : 'from-white to-emerald-50/50 border-emerald-100'}`}
+2854:                  <p className={`text-sm font-bold uppercase tracking-widest mb-8 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>Review Mode</p>
+2856:                  <h3 className={`text-5xl md:text-6xl font-black font-outfit mb-4 text-center ${isDarkMode ? 'text-white text-3d-sm' : 'text-slate-800 text-3d-sm'}`}>
+2860:                  <div className={`inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-xl shadow-inner border ${isDarkMode ? 'bg-[#212f45]/50 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
+2867:                      <label className={`text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Recall Meaning</label>
+2873:                        className={`w-full px-4 py-3 rounded-xl border outline-none transition-colors ${isDarkMode ? 'bg-white/5 border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-800 focus:border-[#10B981]'}`}
+2893:                  className={`absolute w-full h-full rounded-[3rem] shadow-lg border flex flex-col p-6 md:p-8 overflow-y-auto overflow-x-hidden ${isDarkMode ? 'bg-gradient-to-br from-[#1A1A1A] to-[#111] border-white/10' : 'bg-gradient-to-br from-[#F8FAFC] to-white border-emerald-100'}`}
+2897:                    <div className={`p-5 rounded-2xl border text-center ${isDarkMode ? 'bg-red-500/10 border-red-500/20' : 'bg-red-50 border-red-100'}`}>
+2898:                      <h4 className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>Bengali Meaning</h4>
+2899:                      <p className={`text-3xl font-bold font-outfit ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>{currentReviewWord.bengaliMeaning}</p>
+2902:                    <div className={`p-5 rounded-2xl border text-left ${isDarkMode ? 'bg-blue-500/10 border-blue-500/20' : 'bg-blue-50 border-blue-100'}`}>
+2903:                      <h4 className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>English Meaning</h4>
+2904:                      <p className={`text-lg font-medium leading-relaxed ${isDarkMode ? 'text-blue-100' : 'text-blue-900'}`}>{currentReviewWord.englishDefinition}</p>
+2909:                        <h4 className={`text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-1 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+2915:                              <span className={`font-bold text-xs mt-1 shrink-0 ${isDarkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>{idx + 1}.</span>
+2917:                                <p className={`text-sm italic ${isDarkMode ? 'text-emerald-100' : 'text-emerald-900'}`}>
+2918:                                  &quot;{highlightWord(ex.english, currentReviewWord.word, isDarkMode)}&quot;
+2937:                <p className={`text-sm font-bold text-center mb-4 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>How well did you know this?</p>
+2951:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+2954:            <div className={`p-2 rounded-full border ${isDarkMode ? 'border-white/10 bg-white/5 text-emerald-400' : 'border-emerald-100 bg-emerald-50 text-emerald-600'}`}>
+2960:            <div className={`p-6 rounded-[2rem] border flex flex-col ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+2962:                <span className={`text-sm font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Input</span>
+2965:                  className={`text-xs px-3 py-1 rounded-full transition-colors ${isDarkMode ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+2974:                className={`w-full flex-1 min-h-[150px] p-4 rounded-xl border text-base focus:ring-2 focus:ring-[#10B981] outline-none resize-none transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-white placeholder-gray-600' : 'bg-gray-50 border-gray-200 text-slate-800 placeholder-gray-400'}`}
+2979:                className={`w-full mt-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors ${isTranslating || !translationInput.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:-translate-y-0.5'} ${isDarkMode ? 'bg-[#10B981] text-white hover:bg-[#34d399]' : 'bg-[#10B981] text-white hover:bg-[#059669]'}`}
+2987:            <div className={`p-6 rounded-[2rem] border flex flex-col ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+2989:                <span className={`text-sm font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Output</span>
+2993:                  className={`p-1.5 rounded-full transition-colors ${!translationOutput || isTranslating || translationOutput.includes('failed') ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'bg-white/10 text-emerald-400 hover:bg-white/20' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+2999:              <div className={`w-full flex-1 min-h-[150px] p-4 rounded-xl border text-lg font-medium transition-colors ${isDarkMode ? 'bg-black/50 border-white/10 text-emerald-100' : 'bg-gray-50 border-gray-200 text-slate-800'} ${isTranslating ? 'animate-pulse' : ''} ${!translationOutput ? 'opacity-50' : ''}`}>
+3008:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3014:                className={`p-2 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+3021:                className={`p-2 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+3038:          <div className={`mb-8 p-6 rounded-[2rem] border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3040:              <h3 className={`font-bold font-outfit ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Daily Goal</h3>
+3042:                <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3047:                  className={`p-1.5 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+3054:            <div className={`w-full h-5 rounded-full overflow-hidden relative ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'}`}>
+3075:          <div className={`mb-8 p-6 rounded-[2rem] border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3076:            <h3 className={`font-bold font-outfit mb-4 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Learn Mode: Practice by Difficulty</h3>
+3083:                    level === 'Beginner' ? (isDarkMode ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50' : 'bg-green-100 text-green-700 hover:bg-green-200') :
+3084:                    level === 'Intermediate' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400 hover:bg-yellow-900/50' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200') :
+3085:                    (isDarkMode ? 'bg-red-900/30 text-red-400 hover:bg-red-900/50' : 'bg-red-100 text-red-700 hover:bg-red-200')
+3096:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3098:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Saved Words</div>
+3100:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3102:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Words Learned</div>
+3104:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3106:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Total Reviews Completed</div>
+3108:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3110:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Correct Reviews</div>
+3112:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3116:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Accuracy</div>
+3118:            <div className={`p-6 rounded-[2rem] border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3120:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Day Streak</div>
+3149:              <div className={`rounded-[2.5rem] shadow-sm border p-8 mb-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3150:                <h3 className={`text-xl font-outfit font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Learning Progress (Last 14 Days)</h3>
+3154:                      <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#333' : '#eee'} vertical={false} />
+3157:                        stroke={isDarkMode ? '#888' : '#aaa'} 
+3158:                        tick={{ fill: isDarkMode ? '#888' : '#aaa' }} 
+3168:                        stroke={isDarkMode ? '#888' : '#aaa'} 
+3169:                        tick={{ fill: isDarkMode ? '#888' : '#aaa' }} 
+3175:                        contentStyle={{ backgroundColor: isDarkMode ? '#222' : '#fff', borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+3176:                        labelStyle={{ color: isDarkMode ? '#ccc' : '#666', fontWeight: 'bold', marginBottom: '4px' }}
+3179:                      <ReferenceLine y={userStats.dailyGoal} label={{ position: 'top', value: `Daily Goal (${userStats.dailyGoal})`, fill: isDarkMode ? '#888' : '#aaa', fontSize: 12 }} stroke={isDarkMode ? '#555' : '#ccc'} strokeDasharray="3 3" />
+3205:              <div className={`rounded-[2.5rem] shadow-sm border p-8 mb-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3206:                <h3 className={`text-xl font-outfit font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Tag Usage</h3>
+3210:                      <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#333' : '#eee'} vertical={false} />
+3213:                        stroke={isDarkMode ? '#888' : '#aaa'} 
+3214:                        tick={{ fill: isDarkMode ? '#888' : '#aaa' }} 
+3219:                        stroke={isDarkMode ? '#888' : '#aaa'} 
+3220:                        tick={{ fill: isDarkMode ? '#888' : '#aaa' }} 
+3226:                        contentStyle={{ backgroundColor: isDarkMode ? '#222' : '#fff', borderRadius: '1rem', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+3227:                        labelStyle={{ color: isDarkMode ? '#ccc' : '#666', fontWeight: 'bold', marginBottom: '4px' }}
+3228:                        cursor={{ fill: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}
+3238:          <div className={`rounded-[2.5rem] shadow-sm border p-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3241:                <h3 className={`text-xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Saved Words List</h3>
+3243:                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${isDarkMode ? 'bg-[#10B981]/20 text-[#10B981]' : 'bg-[#10B981]/10 text-[#10B981]'}`}>
+3254:                      ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+3255:                      : (isDarkMode ? 'bg-[#111] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+3269:                        ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+3270:                        : (isDarkMode ? 'bg-[#111] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+3280:                    className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors ${isDarkMode ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+3288:              <p className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>You haven&apos;t saved any words yet.</p>
+3292:                  <p className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>No words match your filters.</p>
+3300:                        className={`p-4 rounded-2xl border flex flex-col justify-between cursor-pointer transition-colors ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 hover:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 hover:bg-[#F0FDF8]'}`}
+3306:                                <h4 className={`font-bold text-lg ${isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>{word.word}</h4>
+3308:                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-amber-900/30 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>Due</span>
+3311:                              <p className={`text-xs mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-slate-500'} line-clamp-1`}>{word.bengaliMeaning}</p>
+3316:                                  word.difficultyLevel.toLowerCase() === 'beginner' ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700') :
+3317:                                  word.difficultyLevel.toLowerCase() === 'intermediate' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700') :
+3318:                                  (isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700')
+3324:                                <span className={`text-[10px] font-bold flex items-center gap-1 px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-indigo-900/30 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+3339:                                isDarkMode 
+3347:                                  <div key={exIdx} className={`text-[11px] flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-600/80'}`}>
+3356:                            <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+3369:          <div className={`rounded-[2.5rem] shadow-sm border p-8 mt-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3370:            <h3 className={`text-xl font-outfit font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Offline Access & Sync</h3>
+3371:            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3376:              <h4 className={`text-sm font-bold uppercase tracking-widest mb-3 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3392:                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors border ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 disabled:opacity-50' : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-slate-600 disabled:opacity-50'}`}
+3406:                className={`flex-1 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 ${isDarkMode ? 'bg-black/50 border-white/10 text-white placeholder-gray-600' : 'bg-gray-50 border-gray-200 text-slate-800 placeholder-gray-400'}`}
+3424:            <div className={`p-4 rounded-xl border flex items-center justify-between mb-8 ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+3434:                  <p className={`font-bold ${isDarkMode ? 'text-gray-200' : 'text-slate-700'}`}>
+3437:                  <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+3444:            <div className={`pt-6 border-t ${isDarkMode ? 'border-white/10' : 'border-gray-200'}`}>
+3446:                <h4 className={`text-sm font-bold uppercase tracking-widest ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3462:                    <div key={word} className={`flex items-center justify-between p-2 rounded-lg border ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'} transition-colors`}>
+3463:                      <span className={`text-sm font-bold truncate ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+3468:                        className={`p-1.5 rounded-md transition-colors ${isDarkMode ? 'text-gray-500 hover:text-red-400 hover:bg-red-500/20' : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}`}
+3477:                <div className={`p-4 rounded-xl border text-center ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+3478:                  <p className={`text-sm italic ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>No words downloaded yet.</p>
+3487:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3491:              <span className={`px-3 py-1 rounded-full text-sm font-bold ${isDarkMode ? 'bg-[#10B981]/20 text-[#10B981]' : 'bg-[#10B981]/10 text-[#10B981]'}`}>
+3497:          <div className={`rounded-[2.5rem] shadow-sm border p-8 mb-6 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3500:                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+3506:                  className={`w-full pl-9 pr-4 py-2 rounded-xl text-sm outline-none border transition-colors ${isDarkMode ? 'bg-[#222] border-white/10 text-white focus:border-[#10B981]' : 'bg-gray-50 border-gray-200 text-slate-700 focus:border-[#10B981]'}`}
+3515:                      ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+3516:                      : (isDarkMode ? 'bg-[#222] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+3530:                        ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+3531:                        : (isDarkMode ? 'bg-[#222] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+3543:                <BookOpen className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-slate-300'}`} />
+3544:                <p className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>You haven&apos;t saved any words yet.</p>
+3550:                    <p className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>No words match your search or filters.</p>
+3560:                      className={`p-4 rounded-2xl border flex flex-col justify-between cursor-pointer transition-all hover:-translate-y-1 ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 hover:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 hover:bg-white shadow-sm hover:shadow-md'}`}
+3565:                            <h4 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{word.word}</h4>
+3570:                                word.difficultyLevel.toLowerCase() === 'beginner' ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700') :
+3571:                                word.difficultyLevel.toLowerCase() === 'intermediate' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700') :
+3572:                                (isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700')
+3578:                              <span className={`text-[10px] font-bold flex items-center gap-1 px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-indigo-900/30 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+3585:                          <p className={`text-sm line-clamp-2 mt-1 mb-2 ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>{word.englishDefinition}</p>
+3599:                              isDarkMode 
+3607:                                <div key={exIdx} className={`text-[11px] flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-600/80'}`}>
+3625:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3631:                className={`flex items-center gap-2 text-sm transition-colors px-4 py-2 rounded-xl font-medium ${isDarkMode ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400' : 'bg-red-50 hover:bg-red-100 text-red-600'}`}
+3638:          <div className={`rounded-[2.5rem] shadow-sm border p-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3641:                <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center mb-6 ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#F0FDF8] text-[#10B981]'}`}>
+3644:                <p className={`font-medium text-lg ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>No recent searches</p>
+3668:                      className={`p-4 rounded-2xl border transition-all cursor-pointer group flex justify-between items-center outline-none ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 focus:border-[#10B981]/50 hover:bg-white/5 focus:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 focus:border-[#10B981]/30 hover:bg-[#F0FDF8] focus:bg-[#F0FDF8]'}`}
+3671:                        <h4 className={`font-bold text-lg transition-colors ${isDarkMode ? 'text-gray-200 group-hover:text-[#10B981] group-focus:text-[#10B981]' : 'text-slate-800 group-hover:text-[#10B981] group-focus:text-[#10B981]'}`}>{item.word}</h4>
+3672:                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+3682:                          className={`p-2 rounded-full opacity-0 group-hover:opacity-100 group-focus:opacity-100 group-focus-within:opacity-100 transition-all ${isDarkMode ? 'hover:bg-red-500/10 text-red-400' : 'hover:bg-red-50 text-red-500'}`}
+3687:                        <ArrowRight className={`w-5 h-5 transition-colors ${isDarkMode ? 'text-gray-600 group-hover:text-[#10B981] group-focus:text-[#10B981]' : 'text-gray-300 group-hover:text-[#10B981] group-focus:text-[#10B981]'}`} />
+3699:            <h2 className={`text-3xl font-outfit font-extrabold text-3d-sm flex items-center gap-3 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3707:              className={`p-2 rounded-full border transition-colors flex items-center gap-2 px-4 shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-slate-600 hover:bg-gray-50 hover:text-slate-900'}`}
+3714:          <div className={`rounded-[2.5rem] shadow-sm border p-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+3717:                <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20 ${isDarkMode ? 'bg-emerald-950/50' : 'bg-[#F0FDF8]'}`}>
+3720:                <h3 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Ready to test your knowledge?</h3>
+3721:                <p className={`mb-8 max-w-md ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3750:                  <span className={`text-sm font-bold ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+3754:                    <span className={`text-xl font-bold flex items-center gap-2 ${quizTimeLeft <= 5 ? 'text-red-500 animate-pulse' : isDarkMode ? 'text-blue-400' : 'text-blue-500'}`}>
+3758:                  <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3767:                <h3 className={`text-2xl font-bold mb-8 text-center leading-relaxed ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+3779:                      btnClass += isDarkMode ? 'border-white/10 hover:border-emerald-500/50 hover:bg-white/5' : 'border-gray-200 hover:border-emerald-500/50 hover:bg-gray-50';
+3785:                      btnClass += isDarkMode ? 'border-white/5 opacity-50' : 'border-gray-100 opacity-50';
+3812:                <h3 className={`text-3xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+3815:                <p className={`mb-8 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3831:                    className={`px-8 py-4 rounded-2xl font-bold transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-gray-200 hover:bg-gray-300 text-slate-800'}`}
+3849:          <h1 className={`text-5xl md:text-7xl font-outfit font-extrabold mb-6 leading-[1.1] text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+3853:          <p className={`max-w-md mx-auto mb-10 text-base md:text-lg ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3859:            <form onSubmit={handleSearch} className={`group w-full rounded-[2rem] shadow-sm p-1 sm:p-2 flex items-center border transition-all duration-300 ease-out z-20 relative focus-within:-translate-y-1 focus-within:scale-[1.01] focus-within:ring-4 focus-within:ring-[#10B981]/20 ${isDarkMode ? 'bg-[#111] border-white/10 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/50' : 'bg-white border-gray-100 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/30'}`}>
+3895:                className={`min-w-0 flex-1 w-20 bg-transparent border-none px-2 sm:px-4 py-3 sm:py-4 outline-none text-sm sm:text-lg ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-slate-700 placeholder-gray-400'}`} 
+3901:                  <span className={`text-xs mr-1 sm:mr-2 hidden md:inline-block ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+3912:                    className={`p-1 sm:p-1.5 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
+3922:                className={`p-1.5 sm:p-3 mr-1 sm:mr-2 rounded-full transition-colors shrink-0 ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : (isDarkMode ? 'text-gray-400 hover:bg-white/10' : 'text-gray-400 hover:bg-gray-100')}`}
+3952:                  className={`absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-xl overflow-hidden z-20 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+3955:                    <div className={`px-6 py-4 flex items-center gap-3 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+3964:                      className={`px-6 py-4 cursor-pointer flex flex-col gap-1 transition-colors ${idx === selectedSuggestionIndex ? (isDarkMode ? 'bg-white/10' : 'bg-[#D1F4E6]/50') : ''} ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-[#F0FDF8] text-slate-700'}`}
+3967:                        <Search className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+3970:                          <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ${isDarkMode ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
+3976:                        <span className={`text-sm pl-7 line-clamp-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+3992:                  className={`absolute top-full left-0 right-0 mt-2 p-5 rounded-2xl border shadow-xl z-20 flex flex-col gap-3 ${isDarkMode ? 'bg-indigo-950/90 border-indigo-500/30 backdrop-blur-md' : 'bg-indigo-50/90 border-indigo-200 backdrop-blur-md'}`}
+3996:                      <div className={`p-2 rounded-xl ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-200 text-indigo-700'}`}>
+4000:                        <p className={`text-sm font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-800'}`}>
+4003:                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-indigo-400/80' : 'text-indigo-600/80'}`}>
+4008:                    <button type="button" onClick={() => setTranscriptionFeedback(null)} className={`p-1 mt-1 shrink-0 rounded-full ${isDarkMode ? 'hover:bg-indigo-400/20 text-indigo-300' : 'hover:bg-indigo-200 text-indigo-700'}`}>
+4014:                      <span className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Did you mean:</span>
+4024:                          className={`px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors border ${isDarkMode ? 'bg-indigo-900 border-indigo-700 text-indigo-100 hover:bg-indigo-800' : 'bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}
+4043:                className={`px-5 py-2 rounded-full border text-sm font-medium transition-colors ${isDarkMode ? 'border-white/10 text-emerald-400 bg-white/5 hover:bg-white/10' : 'border-[#BDE8DB] text-[#10B981] bg-[#F0FDF8] hover:bg-[#E6F5F1]'}`}
+4062:              className={`p-6 rounded-3xl border cursor-pointer group transition-all hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? 'bg-gradient-to-br from-[#111] to-[#0A0A0A] border-white/10 hover:border-indigo-500/50 shadow-indigo-500/10' : 'bg-white border-gray-100 hover:border-indigo-300 shadow-indigo-100/50'}`}
+4064:              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+4067:              <h3 className={`text-xl font-bold font-outfit mb-2 group-hover:text-indigo-500 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Language Translator</h3>
+4068:              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Translate full sentences between English and Bengali using Google AI.</p>
+4081:              className={`p-6 rounded-3xl border cursor-pointer group transition-all hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? 'bg-gradient-to-br from-[#111] to-[#0A0A0A] border-white/10 hover:border-emerald-500/50 shadow-emerald-500/10' : 'bg-white border-gray-100 hover:border-emerald-300 shadow-emerald-100/50'}`}
+4083:              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
+4086:              <h3 className={`text-xl font-bold font-outfit mb-2 group-hover:text-emerald-500 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Vocabulary Quiz</h3>
+4087:              <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Test your knowledge and practice your saved words with our interactive quiz.</p>
+4094:              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+4097:              <h2 className={`text-2xl font-outfit font-bold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Word of the <span className="text-[#10B981]">Day</span></h2>
+4101:              <div className={`w-full h-48 rounded-[2.5rem] border animate-pulse ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}></div>
+4105:                className={`w-full relative overflow-hidden rounded-[2.5rem] border p-8 transition-all hover:-translate-y-1 cursor-pointer group ${isDarkMode ? 'bg-gradient-to-br from-[#111] to-[#0A0A0A] border-white/10 hover:border-[#10B981]/50 hover:shadow-[0_8px_30px_rgb(16,185,129,0.1)]' : 'bg-white border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-[#10B981]/30'}`}
+4108:                <div className={`absolute top-0 right-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none translate-x-1/2 -translate-y-1/2 transition-transform duration-700 group-hover:scale-110 ${isDarkMode ? 'bg-emerald-500' : 'bg-emerald-200'}`} />
+4109:                <div className={`absolute bottom-0 left-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none -translate-x-1/2 translate-y-1/2 transition-transform duration-700 group-hover:scale-110 ${isDarkMode ? 'bg-blue-500' : 'bg-emerald-100'}`} />
+4114:                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black tracking-widest uppercase mb-4 shadow-sm ${isDarkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-700 border border-emerald-100/50'}`}>
+4118:                      <h3 className={`text-4xl sm:text-5xl md:text-6xl font-outfit uppercase tracking-wider mb-2 transition-transform duration-300 group-hover:scale-[1.02] origin-left ${isDarkMode ? 'text-[#10B981] text-3d-sm filter drop-shadow-md' : 'text-[#10B981] text-3d-sm'}`}>
+4121:                      <p className={`text-xl sm:text-2xl font-bold mt-2 font-serif italic ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+4129:                          className={`p-3 sm:p-4 rounded-full transition-all hover:scale-105 shadow-sm ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-emerald-500 hover:text-white border border-white/10' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100/50'}`}
+4138:                              ? (isDarkMode ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border border-emerald-200/50')
+4139:                              : (isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100/50')
+4149:                    <p className={`text-lg sm:text-xl font-bold uppercase leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+4160:            <div className={`p-8 rounded-[2rem] border flex flex-col items-center justify-center text-center transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4162:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>Words<br/>Searchable</div>
+4164:            <div className={`p-8 rounded-[2rem] border flex flex-col items-center justify-center text-center transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4166:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>Free Forever</div>
+4168:            <div className={`p-8 rounded-[2rem] border flex flex-col items-center justify-center text-center transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4170:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>Daily Limits</div>
+4172:            <div className={`p-8 rounded-[2rem] border flex flex-col items-center justify-center text-center transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4174:              <div className={`text-xs font-bold tracking-widest uppercase ${isDarkMode ? 'text-gray-400' : 'text-slate-400'}`}>Goal: Fluency</div>
+4184:                className={`p-6 rounded-[2rem] border flex flex-col items-start text-left cursor-pointer group transition-all hover:-translate-y-1 hover:shadow-xl ${isDarkMode ? `bg-[#111] border-white/10 hover:border-${feature.colorClass.replace('text-', '')}/50` : `bg-white border-gray-100 hover:border-${feature.colorClass.replace('text-', '')}/30`}`}
+4187:                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${isDarkMode ? feature.darkBgClass + ' ' + feature.darkColorClass : feature.bgClass + ' ' + feature.colorClass}`}>
+4190:                  <div className={`text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${isDarkMode ? feature.darkColorClass : feature.colorClass}`}>
+4194:                <h3 className={`text-xl font-outfit font-extrabold mb-2 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>{feature.title}</h3>
+4195:                <p className={`text-base ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>{feature.whatItDoes[0]}</p>
+4203:              <Leaf className={`w-6 h-6 ${isDarkMode ? 'text-[#10B981]' : 'text-[#064E3B]'}`} />
+4206:            <p className={`text-sm max-w-sm ${isDarkMode ? 'text-gray-600' : 'text-slate-300'}`}>
+4275:            <form onSubmit={handleSearch} className={`group w-full rounded-[2rem] shadow-sm p-1 sm:p-2 flex items-center border transition-all duration-300 ease-out z-20 relative focus-within:-translate-y-1 focus-within:scale-[1.01] focus-within:ring-4 focus-within:ring-[#10B981]/20 ${isDarkMode ? 'bg-[#111] border-white/10 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/50' : 'bg-white border-gray-100 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/30'}`}>
+4311:                className={`min-w-0 flex-1 w-20 bg-transparent border-none px-2 sm:px-4 py-3 outline-none text-sm sm:text-lg ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-slate-700 placeholder-gray-400'}`} 
+4317:                  <span className={`text-xs mr-2 hidden md:inline-block ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+4328:                    className={`p-1 sm:p-1.5 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
+4338:                className={`p-1.5 sm:p-2 mr-1 sm:mr-2 rounded-full transition-colors shrink-0 ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : (isDarkMode ? 'text-gray-400 hover:bg-white/10' : 'text-gray-400 hover:bg-gray-100')}`}
+4359:                  className={`absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-xl overflow-hidden z-20 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+4362:                    <div className={`px-6 py-4 flex items-center gap-3 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+4371:                      className={`px-6 py-4 cursor-pointer flex flex-col gap-1 transition-colors ${idx === selectedSuggestionIndex ? (isDarkMode ? 'bg-white/10' : 'bg-[#D1F4E6]/50') : ''} ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-[#F0FDF8] text-slate-700'}`}
+4374:                        <Search className={`w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+4377:                          <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ${isDarkMode ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
+4383:                        <span className={`text-sm pl-7 line-clamp-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+4399:                  className={`absolute top-full left-0 right-0 mt-2 p-5 rounded-2xl border shadow-xl z-20 flex flex-col gap-3 ${isDarkMode ? 'bg-indigo-950/90 border-indigo-500/30 backdrop-blur-md' : 'bg-indigo-50/90 border-indigo-200 backdrop-blur-md'}`}
+4403:                      <div className={`p-2 rounded-xl ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-200 text-indigo-700'}`}>
+4407:                        <p className={`text-sm font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-800'}`}>
+4410:                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-indigo-400/80' : 'text-indigo-600/80'}`}>
+4415:                    <button type="button" onClick={() => setTranscriptionFeedback(null)} className={`p-1 mt-1 shrink-0 rounded-full ${isDarkMode ? 'hover:bg-indigo-400/20 text-indigo-300' : 'hover:bg-indigo-200 text-indigo-700'}`}>
+4421:                      <span className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Did you mean:</span>
+4431:                          className={`px-3 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-colors border ${isDarkMode ? 'bg-indigo-900 border-indigo-700 text-indigo-100 hover:bg-indigo-800' : 'bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}
+4444:            <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+4445:            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+4448:            <h2 className={`text-2xl font-outfit font-bold text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Dictionary <span className="text-[#10B981]">Result</span></h2>
+4449:            <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+4454:            className={`mb-6 flex items-center gap-2 text-sm font-bold transition-colors ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+4459:          <div className={`rounded-[2.5rem] shadow-sm overflow-hidden border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+4462:                <div className={`w-full mb-6 p-4 rounded-2xl flex flex-col gap-3 border ${isDarkMode ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200'}`}>
+4464:                    <Info className={`w-5 h-5 shrink-0 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`} />
+4465:                    <p className={`text-sm font-medium ${isDarkMode ? 'text-amber-300' : 'text-amber-800'}`}>
+4471:                      <span className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-amber-500/80' : 'text-amber-700/80'}`}>Did you mean:</span>
+4476:                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${isDarkMode ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30' : 'bg-white/60 text-amber-900 border border-amber-200 hover:bg-white shadow-sm'}`}
+4488:                  <div className={`mb-4 px-4 py-1.5 w-fit rounded-full text-sm font-bold tracking-wide ${isDarkMode ? 'bg-emerald-950/30 text-emerald-400' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+4494:                      <div className={`inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-[#1e293b] border-slate-700 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-600'}`}>
+4505:                          className={`px-4 h-12 sm:h-14 rounded-2xl border flex items-center justify-center gap-2 transition-colors font-bold text-sm sm:text-base ${isRecording ? 'bg-red-500 text-white border-red-500 animate-pulse' : isDarkMode ? 'bg-white/5 border-white/10 text-red-500 hover:bg-white/10' : 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'}`}
+4513:                          className={`w-12 sm:w-14 h-12 sm:h-14 rounded-2xl border flex items-center justify-center transition-colors ${isSpeaking ? 'bg-[#10B981] text-white border-[#10B981]' : isDarkMode ? 'bg-white/5 border-white/10 text-emerald-400 hover:bg-white/10' : 'bg-[#F0FDF8] border-[#BDE8DB] text-[#10B981] hover:bg-[#E6F5F1]'}`}
+4522:                    <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider ${isDarkMode ? 'bg-sky-900/30 text-sky-400' : 'bg-[#E0F2FE] text-[#0284C7]'}`}>
+4527:                        result.difficultyLevel === 'Beginner' ? (isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700') :
+4528:                        result.difficultyLevel === 'Intermediate' ? (isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700') :
+4529:                        (isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700')
+4539:                <div className={`mb-8 p-5 rounded-3xl border ${isDarkMode ? 'bg-indigo-950/20 border-indigo-500/20' : 'bg-indigo-50/50 border-indigo-100'}`}>
+4541:                    <h4 className={`text-sm font-bold flex items-center gap-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+4546:                      className={`text-xs font-medium px-3 py-1.5 rounded-xl transition-colors ${isRecording ? 'bg-red-500 text-white animate-pulse' : isDarkMode ? 'bg-white/10 text-gray-300 hover:bg-white/20' : 'bg-white text-slate-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+4552:                    <div className={`flex-1 w-full flex items-center justify-between p-4 rounded-2xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+4554:                        <span className={`text-xs font-bold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>Your Recording</span>
+4555:                        <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Listen back</span>
+4557:                      <button onClick={playRecording} className={`p-3 rounded-xl transition-colors ${isDarkMode ? 'bg-sky-900/30 text-sky-400 hover:bg-sky-900/50' : 'bg-sky-50 text-sky-600 hover:bg-sky-100'}`}>
+4562:                    <div className={`text-xs font-bold uppercase tracking-widest ${isDarkMode ? 'text-gray-600' : 'text-slate-300'}`}>
+4566:                    <div className={`flex-1 w-full flex items-center justify-between p-4 rounded-2xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+4568:                        <span className={`text-xs font-bold uppercase tracking-wider mb-1 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>AI Voice</span>
+4569:                        <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Native speaker</span>
+4571:                      <button onClick={() => playPronunciation(result.word)} className={`p-3 rounded-xl transition-colors ${isSpeaking ? 'bg-[#10B981] text-white' : isDarkMode ? 'bg-emerald-900/30 text-emerald-400 hover:bg-emerald-900/50' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
+4584:                    <div className={`mt-5 p-6 rounded-2xl border ${pronunciationScore.isCorrect ? (isDarkMode ? 'bg-emerald-950/40 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200') : (isDarkMode ? 'bg-amber-950/40 border-amber-500/30' : 'bg-amber-50 border-amber-200')} shadow-sm relative overflow-hidden text-left`}>
+4590:                            <div className={`p-2 rounded-xl ${pronunciationScore.isCorrect ? (isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-200 text-emerald-700') : (isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-200 text-amber-700')}`}>
+4593:                            <h4 className={`text-lg md:text-xl font-bold font-outfit ${pronunciationScore.isCorrect ? (isDarkMode ? 'text-emerald-400' : 'text-emerald-700') : (isDarkMode ? 'text-amber-400' : 'text-amber-700')}`}>
+4599:                            <span className={`text-3xl font-black font-outfit ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+4602:                            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>%</span>
+4606:                        <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDarkMode ? 'bg-black/40' : 'bg-white/60'} shadow-inner`}>
+4617:                        <div className={`p-4 rounded-xl mt-1 flex flex-col gap-3 ${isDarkMode ? 'bg-white/5' : 'bg-white/60'} backdrop-blur-sm`}>
+4621:                              <span className={`font-mono text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>/{pronunciationScore.phoneticTranscription}/</span>
+4624:                          <p className={`text-sm md:text-base font-medium leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>
+4629:                              <span className={`font-bold mb-2 block ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Improvement Tips:</span>
+4632:                                  <li key={idx} className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>{tip}</li>
+4648:                <div className={`rounded-3xl p-6 border transition-colors relative overflow-hidden ${isDarkMode ? 'bg-red-500/5 border-red-500/20' : 'bg-red-50 border-red-100'}`}>
+4649:                  <div className={`absolute -right-4 -top-8 opacity-[0.03] text-[10rem] font-black font-serif italic ${isDarkMode ? 'text-red-500' : 'text-red-900'} leading-none pointer-events-none select-none`}>
+4652:                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2 relative z-10 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+4657:                      <p className={`text-3xl md:text-4xl font-black font-outfit ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+4661:                        <CopyButton text={result.bengaliMeaning} isDarkMode={isDarkMode} />
+4666:                      className={`p-3 rounded-full transition-colors shrink-0 ${isSpeaking ? 'bg-red-500/30 text-red-500 animate-pulse' : (isDarkMode ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-white shadow-sm text-red-500 hover:bg-red-50')}`}
+4675:                <div className={`rounded-3xl p-6 border transition-colors relative overflow-hidden ${isDarkMode ? 'bg-blue-500/5 border-blue-500/20' : 'bg-blue-50 border-blue-100'}`}>
+4676:                  <div className={`absolute -right-4 -top-4 opacity-5 ${isDarkMode ? 'text-blue-500' : 'text-blue-900'}`}>
+4680:                    <h4 className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+4685:                      className={`p-2 rounded-full transition-all shrink-0 ${isSpeaking ? 'animate-pulse' : ''} ${isDarkMode ? 'hover:bg-blue-500/20 text-blue-400' : 'hover:bg-blue-200 text-blue-600'}`}
+4691:                  <p className={`text-xl font-medium leading-relaxed relative z-10 ${isDarkMode ? 'text-blue-200' : 'text-blue-900'}`}>
+4696:                      <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${isDarkMode ? 'text-blue-400/70' : 'text-blue-600/70'}`}>Related Synonyms</p>
+4702:                            className={`px-3 py-1.5 rounded-lg text-sm font-bold cursor-pointer transition-colors ${isDarkMode ? 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/40' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+4715:                <div className={`rounded-3xl p-6 mb-4 border relative overflow-hidden ${isDarkMode ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
+4719:                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-5 flex items-center gap-2 relative z-10 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
+4725:                        <span className={`font-bold mt-0.5 shrink-0 ${isDarkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>{idx + 1}.</span>
+4727:                          {ex.context && <span className={`text-[10px] w-fit font-bold uppercase tracking-wider px-2 py-0.5 rounded-md mb-1 ${isDarkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-100 text-emerald-700'}`}>{ex.context}</span>}
+4729:                            <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
+4730:                              &quot;{highlightWord(ex.english, result.word, isDarkMode)}&quot;
+4732:                            <CopyButton text={ex.english} isDarkMode={isDarkMode} />
+4735:                            <p className={`text-sm font-medium flex-1 ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-700/80'}`}>
+4738:                            <CopyButton text={ex.bengali} isDarkMode={isDarkMode} />
+4746:                <div className={`rounded-3xl p-6 mb-4 border relative overflow-hidden ${isDarkMode ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
+4751:                    <h4 className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
+4760:                          : isDarkMode 
+4777:                        <span className={`font-bold mt-0.5 shrink-0 ${isDarkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>{idx + 1}.</span>
+4779:                          <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
+4780:                            &quot;{highlightWord(ex, result.word, isDarkMode)}&quot;
+4782:                          <CopyButton text={ex} isDarkMode={isDarkMode} />
+4789:                <div className={`rounded-3xl p-6 mb-4 border flex flex-col gap-4 ${isDarkMode ? 'bg-emerald-900/10 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
+4791:                    <h4 className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
+4800:                          : isDarkMode 
+4815:                    <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
+4816:                      &quot;{highlightWord(result.exampleSentence, result.word, isDarkMode)}&quot;
+4818:                    <CopyButton text={result.exampleSentence} isDarkMode={isDarkMode} />
+4825:                <div className={`rounded-3xl p-6 mb-8 border relative overflow-hidden ${isDarkMode ? 'bg-amber-900/10 border-amber-900/30' : 'bg-amber-50 border-amber-100'}`}>
+4829:                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-5 flex items-center gap-2 relative z-10 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+4834:                      <div key={idx} className={`p-4 rounded-xl border flex gap-3 text-left items-start transition-colors ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
+4835:                        <div className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center font-bold text-xs mt-0.5 ${isDarkMode ? 'bg-amber-900/50 text-amber-400' : 'bg-amber-100 text-amber-600'}`}>{idx + 1}</div>
+4837:                          <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-slate-700'}`}>{typeof tip === 'string' ? tip : tip.english}</p>
+4839:                            <p className={`text-sm font-medium mt-1 ${isDarkMode ? 'text-amber-400/80' : 'text-amber-700/80'}`}>{tip.bengali}</p>
+4847:                <div className={`rounded-3xl p-6 mb-8 border flex gap-4 ${isDarkMode ? 'bg-amber-950/20 border-amber-500/20' : 'bg-amber-50 border-amber-100'}`}>
+4849:                  <p className={`text-base leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-slate-600'}`}>
+4857:                <div className={`rounded-3xl p-6 mb-8 border transition-colors relative overflow-hidden ${isDarkMode ? 'bg-indigo-500/5 border-indigo-500/20' : 'bg-indigo-50 border-indigo-100'}`}>
+4858:                  <div className={`absolute -right-4 -top-4 opacity-5 ${isDarkMode ? 'text-indigo-500' : 'text-indigo-900'}`}>
+4861:                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+4864:                  <p className={`text-sm mb-4 relative z-10 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-700'}`}>
+4872:                        className={`px-3 py-1.5 rounded-lg text-sm font-bold cursor-pointer transition-colors ${isDarkMode ? 'bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/40' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'}`}
+4893:                    className={`flex-1 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}
+4899:                    className={`px-6 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white' : 'bg-gray-100 text-slate-600 hover:bg-gray-200 hover:text-slate-900 border border-gray-200'}`}
+4916:                  <div className={`mt-4 p-4 rounded-2xl border ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+4917:                    <p className={`text-sm text-center mb-3 font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Review this word now to update its schedule:</p>
+4929:                      <div className={`mt-4 p-4 rounded-2xl border space-y-4 ${isDarkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'}`}>
+4931:                          <label className={`block text-xs font-bold mb-1 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Personal Notes</label>
+4936:                            className={`w-full p-3 rounded-xl border text-sm focus:ring-2 focus:ring-[#10B981] outline-none resize-none h-20 ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-200 text-slate-800'}`}
+4941:                            <label className={`block text-xs font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Custom Examples (one per line)</label>
+4945:                              className={`text-xs font-bold flex items-center gap-1 transition-colors ${isGeneratingExample ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'text-[#10B981] hover:text-[#34d399]' : 'text-[#10B981] hover:text-[#059669]'}`}
+4955:                            className={`w-full p-3 rounded-xl border text-sm focus:ring-2 focus:ring-[#10B981] outline-none resize-none h-24 ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-200 text-slate-800'}`}
+4960:                            <label className={`block text-xs font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Tags (comma separated)</label>
+4964:                              className={`text-xs font-bold flex items-center gap-1 transition-colors ${isGeneratingTags ? 'opacity-50 cursor-not-allowed' : ''} ${isDarkMode ? 'text-[#10B981] hover:text-[#34d399]' : 'text-[#10B981] hover:text-[#059669]'}`}
+4975:                            className={`w-full p-3 rounded-xl border text-sm focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black/50 border-white/10 text-white' : 'bg-white border-gray-200 text-slate-800'}`}
+4980:                                <span key={idx} className={`text-[10px] px-2 py-1 rounded-md uppercase tracking-wider font-bold ${isDarkMode ? 'bg-emerald-950/50 text-emerald-400' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+4996:          <div className={`mt-8 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 ${isDarkMode ? 'border-white/10' : 'border-gray-200'}`}>
+4998:              <div className={`flex items-center gap-2 text-sm font-medium mx-auto sm:mx-0 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+5004:                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Was this helpful?</span>
+5005:                  <button onClick={() => setFeedbackSubmitted(true)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-gray-100 text-slate-600'}`}>
+5008:                  <button onClick={() => setFeedbackSubmitted(true)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-gray-100 text-slate-600'}`}>
+5012:                <button onClick={() => setFeedbackSubmitted(true)} className={`flex items-center gap-2 text-sm font-medium transition-colors ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}>
+5025:          <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+5026:          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+5029:          <div className={`h-px flex-1 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+5033:          <h2 className={`text-4xl font-outfit font-extrabold mb-3 text-3d-sm ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>My <span className="text-[#10B981]">Saved</span> Vocabulary</h2>
+5034:          <p className={`text-base mb-6 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>{savedWords.length} words saved</p>
+5048:                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors ${difficultyFilter === level ? `${activeBgColor} text-white` : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white' : 'bg-gray-100 text-slate-600 hover:bg-gray-200 hover:text-slate-900'}`}
+5062:                    ? (isDarkMode ? 'bg-emerald-900/30 border-emerald-500/50 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-600')
+5063:                    : (isDarkMode ? 'bg-[#111] border-white/10 text-white focus:border-[#10B981]' : 'bg-white border-gray-200 text-slate-700 focus:border-[#10B981]')
+5075:        <div className={`rounded-[2.5rem] shadow-sm border p-8 md:p-12 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+5078:              <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center mb-6 ${isDarkMode ? 'bg-emerald-950/30 text-emerald-500' : 'bg-[#F0FDF8] text-[#10B981]'}`}>
+5081:              <p className={`font-medium text-lg ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>No words saved yet</p>
+5087:                  <p className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>No words match your current filters.</p>
+5094:                    className={`p-4 rounded-2xl border transition-all cursor-pointer group flex justify-between items-center ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 hover:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 hover:bg-[#F0FDF8]'}`}
+5098:                        <h4 className={`font-bold text-lg transition-colors flex items-center gap-2 ${isDarkMode ? 'text-gray-200 group-hover:text-[#10B981]' : 'text-slate-800 group-hover:text-[#10B981]'}`}>
+5110:                        <div className={`text-sm mt-1 flex items-center gap-1.5 ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+5114:                            className={`p-1 rounded-full transition-colors ${isSpeaking ? 'text-red-500' : isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-red-400' : 'text-slate-400 hover:bg-gray-100 hover:text-red-500'}`}
+5123:                              <span key={tIdx} className={`text-[10px] flex items-center gap-1 font-bold px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+5130:                          <div className={`mt-3 pt-3 border-t flex flex-col gap-2 ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+5132:                              <div className={`text-xs italic ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+5139:                                  <div key={exIdx} className={`text-xs flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+5149:                    <ArrowRight className={`w-5 h-5 shrink-0 ml-4 transition-colors ${isDarkMode ? 'text-gray-600 group-hover:text-[#10B981]' : 'text-gray-300 group-hover:text-[#10B981]'}`} />
+5174:              className={`w-full max-w-sm rounded-[2rem] p-6 shadow-2xl border text-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+5176:              <div className={`w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 ${isDarkMode ? 'bg-red-500/10 text-red-500' : 'bg-red-50 text-red-600'}`}>
+5179:              <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Clear Search History?</h3>
+5180:              <p className={`text-sm mb-6 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+5186:                  className={`flex-1 py-3 rounded-xl font-bold transition-colors ${isDarkMode ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-gray-100 text-slate-700 hover:bg-gray-200'}`}
+5221:              className={`w-full max-w-lg p-6 sm:p-8 rounded-3xl shadow-xl border overflow-y-auto max-h-[90vh] ${isDarkMode ? 'bg-[#1a1a1a] border-white/10' : 'bg-white border-gray-200'}`}
+5225:                  <h3 className={`font-outfit text-2xl font-bold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+5228:                  <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Customize your vocabulary quiz</p>
+5232:                  className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+5240:                  <label className={`block text-sm font-bold mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Questions Per Quiz</label>
+5249:                            : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+5259:                  <label className={`block text-sm font-bold mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Time Limit Per Question</label>
+5268:                            : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+5278:                  <label className={`block text-sm font-bold mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Question Types</label>
+5280:                    <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}>
+5282:                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-indigo-900/30 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
+5286:                          <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Bengali Meaning</span>
+5287:                          <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Translate words between English & Bengali</span>
+5297:                        <div className={`w-6 h-6 rounded-full transition-colors flex items-center justify-center ${quizSettings.types.meaning ? 'bg-[#10B981]' : isDarkMode ? 'bg-gray-800 border-2 border-gray-600' : 'bg-white border-2 border-gray-300'}`}>
+5303:                    <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}>
+5305:                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-amber-900/30 text-amber-400' : 'bg-amber-100 text-amber-600'}`}>
+5309:                          <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Pronunciation Match</span>
+5310:                          <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Identify the word by its audio</span>
+5320:                        <div className={`w-6 h-6 rounded-full transition-colors flex items-center justify-center ${quizSettings.types.pronunciation ? 'bg-[#10B981]' : isDarkMode ? 'bg-gray-800 border-2 border-gray-600' : 'bg-white border-2 border-gray-300'}`}>
+5326:                    <label className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}>
+5328:                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-sky-900/30 text-sky-400' : 'bg-sky-100 text-sky-600'}`}>
+5332:                          <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Examples</span>
+5333:                          <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Fill in the blanks with target words</span>
+5343:                        <div className={`w-6 h-6 rounded-full transition-colors flex items-center justify-center ${quizSettings.types.example ? 'bg-[#10B981]' : isDarkMode ? 'bg-gray-800 border-2 border-gray-600' : 'bg-white border-2 border-gray-300'}`}>
+5355:                  className={`flex-1 py-3 rounded-xl font-bold transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
+5378:              className={`w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+5381:                <h3 className={`text-2xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Settings</h3>
+5384:                  className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+5393:                  <h4 className={`text-lg font-bold border-b pb-2 ${isDarkMode ? 'text-white border-white/10' : 'text-slate-800 border-gray-100'}`}>Learning Goals & Reminders</h4>
+5396:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5400:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5413:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5418:                    <label className={`flex items-center gap-2 text-sm font-bold ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5422:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5435:                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${userStats.dailyReminders ? 'bg-[#10B981]' : (isDarkMode ? 'bg-gray-700' : 'bg-gray-300')}`}
+5444:                  <h4 className={`text-lg font-bold border-b pb-2 ${isDarkMode ? 'text-white border-white/10' : 'text-slate-800 border-gray-100'}`}>Text-to-Speech (TTS) Settings</h4>
+5447:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5451:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5459:                        className={`flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-colors ${ttsEngine === 'browser' ? 'bg-[#10B981] text-white' : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+5465:                        className={`flex-1 py-2 px-4 rounded-xl font-bold text-sm transition-colors ${ttsEngine === 'gemini' ? 'bg-[#10B981] text-white' : isDarkMode ? 'bg-white/5 text-gray-400 hover:bg-white/10' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+5475:                        <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5479:                            <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5487:                          className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5497:                        <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5501:                            <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5509:                          className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5522:                      <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5526:                          <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5534:                        className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5547:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5551:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5565:                    <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+5575:                  <h4 className={`text-lg font-bold border-b pb-2 ${isDarkMode ? 'text-white border-white/10' : 'text-slate-800 border-gray-100'}`}>Spaced Repetition (SRS)</h4>
+5578:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5582:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5592:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5597:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5601:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5611:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5616:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5620:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5631:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5636:                    <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5640:                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+5650:                      className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
+5682:              className={`w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl border ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}
+5685:                <div className={`w-16 h-16 rounded-[2rem] flex items-center justify-center ${isDarkMode ? selectedFeatureDetails.darkBgClass + ' ' + selectedFeatureDetails.darkColorClass : selectedFeatureDetails.bgClass + ' ' + selectedFeatureDetails.colorClass}`}>
+5690:                  className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+5696:              <h3 className={`text-3xl font-outfit font-extrabold mb-6 ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
+5702:                  <h4 className={`text-sm font-bold tracking-widest uppercase mb-4 flex items-center gap-2 ${isDarkMode ? selectedFeatureDetails.darkColorClass : selectedFeatureDetails.colorClass}`}>
+5707:                      <li key={index} className={`text-lg leading-relaxed flex items-start gap-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5715:                  <h4 className={`text-sm font-bold tracking-widest uppercase mb-4 flex items-center gap-2 ${isDarkMode ? selectedFeatureDetails.darkColorClass : selectedFeatureDetails.colorClass}`}>
+5720:                      <li key={index} className={`text-lg leading-relaxed flex items-start gap-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+5730:                className={`w-full mt-8 py-4 rounded-xl font-bold transition-colors ${isDarkMode ? selectedFeatureDetails.darkBgClass + ' ' + selectedFeatureDetails.darkColorClass + ' hover:bg-white/10' : selectedFeatureDetails.bgClass + ' ' + selectedFeatureDetails.colorClass + ' hover:brightness-95'}`}
+5746:            className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl z-[100] font-medium flex items-center gap-3 backdrop-blur-md ${isDarkMode ? 'bg-emerald-900/90 text-emerald-100 border border-emerald-500/30' : 'bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-emerald-500/20'}`}

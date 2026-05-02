@@ -11,7 +11,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { UserProfile } from './UserProfile';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../lib/firebase';
-import { fetchSavedWordsFromFirestore, syncSavedWordsToFirestore, syncSessionToFirestore, fetchSessionFromFirestore } from '../lib/firestore-sync';
+import { fetchSavedWordsFromFirestore, syncSavedWordsToFirestore } from '../lib/firestore-sync';
 
 // Initialize Gemini API
 const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
@@ -130,6 +130,7 @@ interface UserStats {
   dailyGoal: number;
   todayReviews: number;
   learningHistory?: LearningHistoryEntry[];
+  dailyReminders?: boolean;
 }
 
 interface SRSSettings {
@@ -282,6 +283,19 @@ export default function DictionaryApp() {
   const [transcriptionFeedback, setTranscriptionFeedback] = useState<{confidence: string, alternatives: string[]} | null>(null);
   const [savedWords, setSavedWords] = useState<SavedWord[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const [userStats, setUserStats] = useState<UserStats>({
+    wordsLearned: 0,
+    totalReviews: 0,
+    correctReviews: 0,
+    currentStreak: 0,
+    lastReviewDate: null,
+    dailyGoal: 10,
+    todayReviews: 0,
+    dailyReminders: undefined
+  });
+
+  const [showStudyReminder, setShowStudyReminder] = useState(false);
   
   // Daily study reminder feature
   useEffect(() => {
@@ -293,18 +307,18 @@ export default function DictionaryApp() {
         let permission = Notification.permission;
         
         // Request permission if not already granted or denied
-        if (permission === "default") {
+        if (permission === "default" && userStats.dailyReminders) {
           permission = await Notification.requestPermission();
         }
         
-        if (permission === "granted") {
+        if (permission === "granted" && userStats.dailyReminders) {
           const lastNotifiedDate = localStorage.getItem("learnEnglishEasy_lastStudyNotificationDate");
           const today = new Date().toDateString();
           
           if (lastNotifiedDate !== today) {
             // Check if there are due words
             const dueWordsCount = savedWords.filter(w => w.srs && new Date(w.srs.nextReviewDate) <= new Date()).length;
-            if (dueWordsCount > 0) {
+            if (dueWordsCount > 0 && userStats.lastReviewDate !== today) {
                new Notification("Time to study!", {
                  body: `You have ${dueWordsCount} word(s) due for review today. Keep up your learning streak!`,
                  icon: "/favicon.ico" // Browser default icon fallback usually
@@ -319,14 +333,37 @@ export default function DictionaryApp() {
     };
     
     // We run it if user has saved words
-    if (savedWords.length > 0) {
+    if (savedWords.length > 0 && userStats.dailyReminders !== false) {
       // Small delay so it's not aggressive on initial render
       const timeoutId = setTimeout(() => {
         setupNotifications();
       }, 3000);
       return () => clearTimeout(timeoutId);
     }
-  }, [savedWords]);
+  }, [savedWords, userStats.dailyReminders, userStats.lastReviewDate]);
+
+  // In-app Study Reminder Logic
+  useEffect(() => {
+    if (!isLoaded || savedWords.length === 0) return;
+    
+    const today = new Date().toDateString();
+    
+    // Have they already reviewed today?
+    if (userStats.lastReviewDate === today) return;
+    
+    // Has the banner been dismissed today?
+    if (localStorage.getItem('learnEnglishEasy_reminderDismissedDate') === today) return;
+    
+    // Have they explicitly turned OFF reminders?
+    if (userStats.dailyReminders === false) return;
+    
+    const dueWordsCount = savedWords.filter(w => w.srs && new Date(w.srs.nextReviewDate) <= new Date()).length;
+    
+    if (dueWordsCount > 0) {
+      setShowStudyReminder(true);
+    }
+  }, [isLoaded, userStats.lastReviewDate, userStats.dailyReminders, savedWords]);
+
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -339,7 +376,6 @@ export default function DictionaryApp() {
   const [translationOutput, setTranslationOutput] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
   const [isTranslatingExamples, setIsTranslatingExamples] = useState(false);
-  const [isSavingSession, setIsSavingSession] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizState, setQuizState] = useState<'start' | 'playing' | 'finished'>('start');
   const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
@@ -398,16 +434,6 @@ export default function DictionaryApp() {
   const voiceSearchRecorderRef = React.useRef<MediaRecorder | null>(null);
   const voiceSearchChunksRef = React.useRef<Blob[]>([]);
 
-  const [userStats, setUserStats] = useState<UserStats>({
-    wordsLearned: 0,
-    totalReviews: 0,
-    correctReviews: 0,
-    currentStreak: 0,
-    lastReviewDate: null,
-    dailyGoal: 10,
-    todayReviews: 0
-  });
-
   const [downloadingWords, setDownloadingWords] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [wordsToDownload, setWordsToDownload] = useState('');
@@ -416,7 +442,12 @@ export default function DictionaryApp() {
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showBengali, setShowBengali] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('learnEnglishEasy_theme') === 'dark';
+    }
+    return false;
+  });
   const [isOffline, setIsOffline] = useState(false);
   const [wotd, setWotd] = useState<WordDetails | null>(null);
   const [wotdLoading, setWotdLoading] = useState(true);
@@ -432,74 +463,6 @@ export default function DictionaryApp() {
   const toastTimeoutRef = React.useRef<any>(null);
 
   const [user] = useAuthState(auth);
-
-  const handleSaveSession = async () => {
-    if (!user) {
-      showToast("Please sign in to save your session.");
-      return;
-    }
-    
-    setIsSavingSession(true);
-    try {
-      const sessionData = {
-        quizState,
-        quizScore,
-        currentQuizIndex,
-        quizQuestions,
-        reviewMode,
-        reviewQueue,
-      };
-      await syncSessionToFirestore(user.uid, 'current', sessionData);
-      showToast("Session saved to your account!");
-    } catch (e) {
-      console.error(e);
-      showToast("Failed to save session.");
-    } finally {
-      setIsSavingSession(false);
-    }
-  };
-
-  const handleRestoreSession = async () => {
-    if (!user) {
-      showToast("Please sign in to restore your session.");
-      return;
-    }
-    
-    setIsSavingSession(true); // Reusing as loading state for session restoring
-    try {
-      const sessionData = await fetchSessionFromFirestore(user.uid, 'current');
-      if (sessionData) {
-        setQuizState(sessionData.quizState || 'start');
-        setQuizScore(sessionData.quizScore || 0);
-        setCurrentQuizIndex(sessionData.currentQuizIndex || 0);
-        setQuizQuestions(sessionData.quizQuestions || []);
-        
-        setReviewMode(sessionData.reviewMode || 'front');
-        setReviewQueue(sessionData.reviewQueue || []);
-        
-        if (sessionData.quizState && sessionData.quizState !== 'start') {
-          // Open Quiz View
-          setShowQuiz(true);
-          setShowDashboard(false);
-          setShowGlossary(false);
-          setShowHistory(false);
-          setResult(null);
-        } else if (sessionData.reviewQueue && sessionData.reviewQueue.length > 0) {
-          // Let review modal open if queue > 0
-          setShowDashboard(false);
-        }
-        
-        showToast("Session restored successfully!");
-      } else {
-        showToast("No saved session found.");
-      }
-    } catch (e) {
-      console.error(e);
-      showToast("Failed to restore session.");
-    } finally {
-      setIsSavingSession(false);
-    }
-  };
 
   // Sync with Firestore when auth state changes
   useEffect(() => {
@@ -604,11 +567,6 @@ export default function DictionaryApp() {
       } catch (e) {
         console.error("Failed to parse history", e);
       }
-    }
-    
-    const savedTheme = localStorage.getItem('learnEnglishEasy_theme');
-    if (savedTheme === 'dark') {
-      setIsDarkMode(true);
     }
 
     const savedStats = localStorage.getItem('learnEnglishEasy_userStats');
@@ -804,9 +762,14 @@ export default function DictionaryApp() {
     localStorage.setItem('learnEnglishEasy_history', JSON.stringify(searchHistory));
   }, [searchHistory]);
   
-  // Save theme to localStorage when updated
+  // Save theme to localStorage and update document.documentElement when updated
   useEffect(() => {
     localStorage.setItem('learnEnglishEasy_theme', isDarkMode ? 'dark' : 'light');
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [isDarkMode]);
 
   // Save stats to localStorage when updated
@@ -960,7 +923,7 @@ export default function DictionaryApp() {
     fetchWotd();
   }, []);
 
-  const goHome = () => {
+  const goHomeInternal = React.useCallback(() => {
     isTypingRef.current = false;
     setResult(null);
     setSearchQuery('');
@@ -974,7 +937,34 @@ export default function DictionaryApp() {
     setReviewMode('none');
     setCurrentReviewWord(null);
     setShowSuggestions(false);
-  };
+  }, []);
+
+  const goHome = React.useCallback(() => {
+    if (typeof window !== 'undefined' && window.history.state?.internalAppFeature) {
+      window.history.back();
+    } else {
+      goHomeInternal();
+    }
+  }, [goHomeInternal]);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const isFeatureOpen = showHistory || showGlossary || showDashboard || showTranslator || showQuiz || showQuizSettings || result !== null || reviewMode !== 'none';
+    if (isFeatureOpen && !window.history.state?.internalAppFeature) {
+      window.history.pushState({ internalAppFeature: true }, '');
+    }
+  }, [showHistory, showGlossary, showDashboard, showTranslator, showQuiz, showQuizSettings, result, reviewMode]);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handlePopState = (e: PopStateEvent) => {
+      if (!e.state?.internalAppFeature) {
+        goHomeInternal();
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [goHomeInternal]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showSuggestions || suggestions.length === 0) return;
@@ -1201,8 +1191,8 @@ export default function DictionaryApp() {
               synonyms: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 to 5 simple English synonyms for the word." },
               relatedWords: { type: Type.ARRAY, items: { type: Type.STRING }, description: "5 words that are semantically related or commonly used together with the searched word." },
               partOfSpeech: { type: Type.STRING, description: "e.g., NOUN, VERB, ADJECTIVE (all caps)" },
-              isMisspelled: { type: Type.BOOLEAN, description: "Set to true if the originally requested word was misspelled in English." },
-              spellcheckSuggestions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "If isMisspelled is true, provide 1 to 3 alternate valid English words the user might have meant." },
+              isMisspelled: { type: Type.BOOLEAN, description: "Set to true ONLY if the originally requested English word was misspelled. Otherwise, false." },
+              spellcheckSuggestions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "If isMisspelled is true, provide 1 to 3 alternate valid English words. Otherwise, an empty array." },
               examples: { 
                 type: Type.ARRAY, 
                 items: { 
@@ -1214,7 +1204,7 @@ export default function DictionaryApp() {
                   },
                   required: ["english", "bengali", "context"] 
                 }, 
-                description: "Exactly 5 accurate, meaningful, and practical real-life conversational example sentences using the word. These should reflect highly natural, everyday spoken/written English (mainly US variant), showcasing contexts that a user can directly implement in their daily life (e.g., at work, talking to friends, ordering food, emails). Each must have an exact Bengali translation." 
+                description: "Exactly 5 practical, easy-to-understand conversational examples emphasizing real-life situations. Avoid overly formal or poetic examples unless appropriate. Use extremely natural phrasing that a native speaker uses in daily conversation. Each must have an exact Bengali translation." 
               },
               speakingTips: {
                 type: Type.ARRAY,
@@ -1226,12 +1216,12 @@ export default function DictionaryApp() {
                   },
                   required: ["english", "bengali"]
                 },
-                description: "Exactly 5 highly actionable and personalized speaking tips for daily conversation and real-life use. Focus on natural fluency, exact situations to use the word, collocations (words commonly used with it), or pronunciation nuances. Make them directly usable so the learner can sound more like a native speaker today. Each tip must be relevant and meaningful, with an English and a translated Bengali equivalent."
+                description: "Exactly 5 highly actionable and personalized speaking tips for daily conversation and real-life use. Focus on informal usage, 'how it sounds in real life', phrases to combine it with, or pronunciation nuances. Make them directly usable so the learner can sound more like a native speaker today. Each tip must be relevant and meaningful, with an English and a translated Bengali equivalent."
               },
-              dailySpeakingTip: { type: Type.STRING, description: "A short tip on how to use this word. Provide this entirely in Bengali." },
+              dailySpeakingTip: { type: Type.STRING, description: "An overall practical advice in Bengali on how to use this word in daily life effortlessly." },
               difficultyLevel: { type: Type.STRING, description: "The difficulty level of the word: Beginner, Intermediate, or Advanced" }
             },
-            required: ["word", "phonetic", "bengaliMeaning", "englishDefinition", "synonyms", "relatedWords", "partOfSpeech", "examples", "speakingTips", "dailySpeakingTip", "difficultyLevel"]
+            required: ["word", "phonetic", "bengaliMeaning", "englishDefinition", "synonyms", "relatedWords", "partOfSpeech", "examples", "speakingTips", "dailySpeakingTip", "difficultyLevel", "isMisspelled", "spellcheckSuggestions"]
           }
         }
       });
@@ -1784,7 +1774,7 @@ export default function DictionaryApp() {
               {
                 role: "user",
                 parts: [
-                  { text: `Evaluate this pronunciation of the English word: "${targetWord}". Be encouraging and helpful. Respond ONLY with a valid JSON object matching the exact schema provided.` },
+                  { text: `Evaluate this pronunciation of the English word: "${targetWord}". Be encouraging, helpful, and detailed. Provide a score out of 100, the phonetic transcription of what the user actually sounded like, general feedback, and 1 to 3 specific actionable tips for improvement. Respond ONLY with a valid JSON object matching the exact schema provided.` },
                   { inlineData: { mimeType: 'audio/webm', data: base64data } }
                 ]
               }
@@ -1794,11 +1784,13 @@ export default function DictionaryApp() {
               responseSchema: {
                 type: Type.OBJECT,
                 properties: {
-                  score: { type: Type.INTEGER, description: "Score out of 10 for the pronunciation." },
+                  score: { type: Type.INTEGER, description: "Score out of 100 for the pronunciation accuracy." },
                   feedback: { type: Type.STRING, description: "A brief, encouraging tip or observation about how they said it." },
-                  isCorrect: { type: Type.BOOLEAN, description: "Whether the pronunciation is generally understandable and correct." }
+                  isCorrect: { type: Type.BOOLEAN, description: "Whether the pronunciation is generally understandable and correct." },
+                  phoneticTranscription: { type: Type.STRING, description: "The phonetic transcription of what the user sounded like (using IPA)." },
+                  specificTips: { type: Type.ARRAY, items: { type: Type.STRING }, description: "1-3 specific, actionable tips on how to improve the pronunciation of this specific word." }
                 },
-                required: ["score", "feedback", "isCorrect"]
+                required: ["score", "feedback", "isCorrect", "phoneticTranscription", "specificTips"]
               }
             }
           });
@@ -2318,7 +2310,7 @@ export default function DictionaryApp() {
   );
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${isDarkMode ? 'bg-[#0a0a0a] text-gray-100' : 'bg-gradient-to-b from-[#E6F7F2] via-[#F0FDF8] to-[#F8FAFC] text-slate-800'}`}>
+    <div className={`min-h-screen flex flex-col w-full overflow-x-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#0a0a0a] text-gray-100' : 'bg-gradient-to-b from-[#E6F7F2] via-[#F0FDF8] to-[#F8FAFC] text-slate-800'}`}>
       {/* Navbar */}
       <nav className="flex items-center justify-between p-4 md:px-8 md:py-6 max-w-5xl mx-auto w-full relative z-50">
         <div 
@@ -2331,14 +2323,27 @@ export default function DictionaryApp() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex flex-wrap items-center justify-end gap-1 sm:gap-4">
-          <div 
+          <button 
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className={`w-14 h-8 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-300 ${isDarkMode ? 'bg-emerald-500' : 'bg-[#E2E8F0]'}`}
+            className={`relative w-16 h-8 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-500 overflow-hidden ${isDarkMode ? 'bg-slate-700' : 'bg-sky-100 border border-sky-200/50'}`}
+            aria-label="Toggle dark mode"
           >
-            <div className={`w-6 h-6 bg-white rounded-full shadow-sm flex items-center justify-center transition-transform duration-300 ${isDarkMode ? 'translate-x-6 text-emerald-500' : 'translate-x-0 text-slate-500'}`}>
-              {isDarkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            {/* Track background icons */}
+            <div className="absolute inset-0 flex items-center justify-between px-1.5 pointer-events-none">
+              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`}>
+                <Moon className="w-4 h-4 text-emerald-400" />
+              </span>
+              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`}>
+                <Sun className="w-4 h-4 text-amber-500" />
+              </span>
             </div>
-          </div>
+            
+            {/* Sliding thumb */}
+            <div className={`relative w-6 h-6 rounded-full shadow-sm flex items-center justify-center transition-all duration-500 z-10 ${isDarkMode ? 'translate-x-8 bg-slate-800 border border-slate-600' : 'translate-x-0 bg-white border border-slate-100'}`}>
+              <Moon className={`absolute w-3.5 h-3.5 text-emerald-400 transition-all duration-500 ${isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} />
+              <Sun className={`absolute w-3.5 h-3.5 text-amber-500 transition-all duration-500 ${isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} />
+            </div>
+          </button>
           <button 
             onClick={() => {
               setShowQuiz(!showQuiz);
@@ -2391,7 +2396,7 @@ export default function DictionaryApp() {
           >
             <TrendingUp className="w-6 h-6" />
             {dueWordsCount > 0 && (
-              <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-[#0a0a0a]"></span>
+              <span className={`absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 ${isDarkMode ? 'border-[#0a0a0a]' : 'border-white'}`}></span>
             )}
           </button>
           <button 
@@ -2441,14 +2446,27 @@ export default function DictionaryApp() {
 
         {/* Mobile Menu Toggle */}
         <div className="flex md:hidden items-center gap-2">
-          <div 
+          <button 
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className={`w-12 h-7 rounded-full flex items-center p-0.5 cursor-pointer transition-colors duration-300 ${isDarkMode ? 'bg-emerald-500' : 'bg-[#E2E8F0]'}`}
+            className={`relative w-14 h-7 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-500 overflow-hidden ${isDarkMode ? 'bg-slate-700' : 'bg-sky-100 border border-sky-200/50'}`}
+            aria-label="Toggle dark mode"
           >
-            <div className={`w-6 h-6 bg-white rounded-full shadow-sm flex items-center justify-center transition-transform duration-300 ${isDarkMode ? 'translate-x-5 text-emerald-500' : 'translate-x-0 text-slate-500'}`}>
-              {isDarkMode ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+            {/* Track background icons */}
+            <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
+              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`}>
+                <Moon className="w-3.5 h-3.5 text-emerald-400" />
+              </span>
+              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`}>
+                <Sun className="w-3.5 h-3.5 text-amber-500" />
+              </span>
             </div>
-          </div>
+            
+            {/* Sliding thumb */}
+            <div className={`relative w-5 h-5 rounded-full shadow-sm flex items-center justify-center transition-all duration-500 z-10 ${isDarkMode ? 'translate-x-7 bg-slate-800 border border-slate-600' : 'translate-x-0 bg-white border border-slate-100'}`}>
+              <Moon className={`absolute w-3 h-3 text-emerald-400 transition-all duration-500 ${isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} />
+              <Sun className={`absolute w-3 h-3 text-amber-500 transition-all duration-500 ${isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} />
+            </div>
+          </button>
           <button 
             onClick={() => setShowMobileMenu(!showMobileMenu)}
             className={`p-2 rounded-xl transition-colors ${isDarkMode ? 'bg-white/5 text-gray-200 hover:bg-white/10' : 'bg-white shadow-sm text-slate-800 hover:bg-gray-50'}`}
@@ -2522,7 +2540,7 @@ export default function DictionaryApp() {
               <div className="relative">
                 <TrendingUp className="w-5 h-5 text-emerald-500" />
                 {dueWordsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#0a0a0a]"></span>
+                  <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 ${isDarkMode ? 'border-[#0a0a0a]' : 'border-white'}`}></span>
                 )}
               </div>
               <span className="font-medium">Progress Dashboard</span>
@@ -2591,33 +2609,104 @@ export default function DictionaryApp() {
         )}
       </AnimatePresence>
 
+      {/* Study Reminder Banner */}
+      <AnimatePresence>
+        {showStudyReminder && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`w-full max-w-5xl mx-auto mt-4 px-4 relative z-40`}
+          >
+            <div className={`p-4 rounded-xl flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm border-l-4 ${isDarkMode ? 'bg-slate-800/80 border-[#10B981]' : 'bg-white border-[#10B981]'} `}>
+              <div className="flex items-center gap-4 text-left w-full sm:w-auto">
+                <div className={`p-3 rounded-full shrink-0 ${isDarkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-600'}`}>
+                  <Calendar className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Time for your daily review!</h3>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-600'}`}>
+                    {userStats.dailyReminders === undefined 
+                      ? "You have words due. Enable daily reminders to build your learning streak?"
+                      : `You have ${dueWordsCount} word${dueWordsCount !== 1 ? 's' : ''} due for review today.`
+                    }
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0 justify-end">
+                {userStats.dailyReminders === undefined ? (
+                  <>
+                    <button 
+                      onClick={() => {
+                         setUserStats(prev => ({...prev, dailyReminders: true}));
+                         setShowStudyReminder(false);
+                         // Trigger native permission request
+                         if ("Notification" in window && Notification.permission === "default") {
+                           Notification.requestPermission();
+                         }
+                      }}
+                      className="px-4 py-2 bg-[#10B981] text-white rounded-lg text-sm font-bold hover:bg-emerald-600 transition-colors shadow-sm"
+                    >
+                      Enable Reminders
+                    </button>
+                    <button 
+                      onClick={() => {
+                         setUserStats(prev => ({...prev, dailyReminders: false}));
+                         setShowStudyReminder(false);
+                      }}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+                    >
+                      No Thanks
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => {
+                         setShowStudyReminder(false);
+                         setShowDashboard(true);
+                         setResult(null);
+                         setShowHistory(false);
+                         setShowGlossary(false);
+                      }}
+                      className="px-4 py-2 bg-[#10B981] text-white rounded-lg text-sm font-bold hover:bg-emerald-600 transition-colors shadow-sm"
+                    >
+                      Study Now
+                    </button>
+                    <button 
+                      onClick={() => {
+                         localStorage.setItem('learnEnglishEasy_reminderDismissedDate', new Date().toDateString());
+                         setShowStudyReminder(false);
+                      }}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+                    >
+                      Dismiss
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {reviewMode !== 'none' && currentReviewWord ? (
         <div className="w-full max-w-2xl mx-auto px-4 py-8 flex-1 flex flex-col items-center justify-center">
           <div className="w-full flex justify-between items-center mb-8">
             <h2 className={`text-2xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>
               Reviewing <span className="text-[#10B981]">{reviewQueue.length + 1}</span> words
             </h2>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleSaveSession}
-                disabled={isSavingSession || !user}
-                className={`text-sm underline ${isDarkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'} ${!user ? 'opacity-50 cursor-not-allowed no-underline hidden' : ''}`}
-                title={!user ? 'Sign in to save session' : 'Save Session'}
-              >
-                Save
-              </button>
-              <button 
-                onClick={() => {
-                  setReviewMode('none');
-                  setCurrentReviewWord(null);
-                  setReviewQueue([]);
-                  setUserAudioUrl(null);
-                }}
-                className={`text-sm underline ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
-              >
-                Exit Review
-              </button>
-            </div>
+            <button 
+              onClick={() => {
+                setReviewMode('none');
+                setCurrentReviewWord(null);
+                setReviewQueue([]);
+                setUserAudioUrl(null);
+              }}
+              className={`text-sm underline ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+            >
+              Exit Review
+            </button>
           </div>
 
           <div className={`w-full rounded-[2.5rem] shadow-sm border p-8 md:p-12 text-center flex flex-col items-center min-h-[400px] justify-center ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
@@ -2706,14 +2795,14 @@ export default function DictionaryApp() {
                           <span className={`text-3xl font-black font-outfit ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
                             {pronunciationScore.score}
                           </span>
-                          <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>/10</span>
+                          <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>%</span>
                         </div>
                       </div>
 
                       <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDarkMode ? 'bg-black/40' : 'bg-white/60'} shadow-inner`}>
                         <motion.div 
                           initial={{ width: 0 }}
-                          animate={{ width: `${(pronunciationScore.score / 10) * 100}%` }}
+                          animate={{ width: `${pronunciationScore.score}%` }}
                           transition={{ duration: 1, ease: "easeOut" }}
                           className={`h-full rounded-full ${pronunciationScore.isCorrect ? 'bg-emerald-500' : 'bg-amber-500'} relative`}
                         >
@@ -2721,10 +2810,26 @@ export default function DictionaryApp() {
                         </motion.div>
                       </div>
 
-                      <div className={`p-4 rounded-xl mt-1 ${isDarkMode ? 'bg-white/5' : 'bg-white/60'} backdrop-blur-sm`}>
-                        <p className={`text-sm md:text-base font-medium leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                      <div className={`p-4 rounded-xl mt-1 flex flex-col gap-3 ${isDarkMode ? 'bg-white/5' : 'bg-white/60'} backdrop-blur-sm`}>
+                        {pronunciationScore.phoneticTranscription && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-emerald-500">You said:</span>
+                            <span className={`font-mono text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>/{pronunciationScore.phoneticTranscription}/</span>
+                          </div>
+                        )}
+                        <p className={`text-sm md:text-base font-medium leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>
                           {pronunciationScore.feedback}
                         </p>
+                        {pronunciationScore.specificTips && pronunciationScore.specificTips.length > 0 && (
+                          <div className="mt-2 text-sm">
+                            <span className={`font-bold mb-2 block ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Improvement Tips:</span>
+                            <ul className="list-disc pl-5 space-y-1">
+                              {pronunciationScore.specificTips.map((tip: string, idx: number) => (
+                                <li key={idx} className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>{tip}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2904,26 +3009,6 @@ export default function DictionaryApp() {
               Progress <span className="text-[#10B981]">Dashboard</span>
             </h2>
             <div className="flex items-center gap-3">
-              <button
-                onClick={handleSaveSession}
-                disabled={isSavingSession || !user}
-                className={`p-2 rounded-full border transition-colors ${
-                  !user ? 'opacity-50 cursor-not-allowed' : ''
-                } ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
-                title={!user ? 'Sign in to save session' : 'Save Session'}
-              >
-                <Bookmark className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleRestoreSession}
-                disabled={isSavingSession || !user}
-                className={`p-2 rounded-full border transition-colors ${
-                  !user ? 'opacity-50 cursor-not-allowed' : ''
-                } ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
-                title={!user ? 'Sign in to restore session' : 'Restore Session'}
-              >
-                <History className="w-5 h-5" />
-              </button>
               <button 
                 onClick={() => setShowSrsSettings(true)}
                 className={`p-2 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
@@ -3243,7 +3328,7 @@ export default function DictionaryApp() {
                             </div>
                           </div>
                           
-                          <div className="relative">
+                          <div className="relative flex flex-col gap-2 mt-2">
                             <input
                               type="text"
                               placeholder="Add personal note..."
@@ -3256,6 +3341,15 @@ export default function DictionaryApp() {
                                   : 'bg-white border-gray-200 text-slate-800 placeholder:text-slate-400 focus:border-[#10B981]'
                               }`}
                             />
+                            {word.customExamples && word.customExamples.length > 0 && (
+                              <div className="flex flex-col gap-1 mt-1">
+                                {word.customExamples.map((ex, exIdx) => (
+                                  <div key={exIdx} className={`text-[11px] flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-600/80'}`}>
+                                    <span className="opacity-70">&bull;</span> {ex}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
 
                           <div className="flex justify-between items-end mt-3">
@@ -3322,7 +3416,7 @@ export default function DictionaryApp() {
               </button>
             </div>
             {downloadingWords && (
-              <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-4">
+              <div className={`w-full rounded-full h-2.5 mb-4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
                 <div className="bg-[#10B981] h-2.5 rounded-full transition-all duration-300" style={{ width: `${downloadProgress}%` }}></div>
               </div>
             )}
@@ -3492,9 +3586,9 @@ export default function DictionaryApp() {
                         )}
                       </div>
                       
-                      <div className="mt-auto pt-3 border-t border-dashed border-gray-200 dark:border-white/10">
+                      <div className={`mt-auto pt-3 border-t border-dashed ${isDarkMode ? 'border-white/10' : 'border-gray-200'}`}>
                         
-                        <div className="relative">
+                        <div className="relative flex flex-col gap-2">
                           <input
                             type="text"
                             placeholder="Add personal note..."
@@ -3507,6 +3601,15 @@ export default function DictionaryApp() {
                                 : 'bg-gray-50 border-gray-200 text-slate-800 placeholder:text-slate-400 focus:border-[#10B981]'
                             }`}
                           />
+                          {word.customExamples && word.customExamples.length > 0 && (
+                            <div className="flex flex-col gap-1 mt-1">
+                              {word.customExamples.map((ex, exIdx) => (
+                                <div key={exIdx} className={`text-[11px] flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-600/80'}`}>
+                                  <span className="opacity-70">&bull;</span> {ex}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -3551,14 +3654,21 @@ export default function DictionaryApp() {
                       animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                       exit={{ opacity: 0, scale: 0.9, filter: 'blur(4px)' }}
                       transition={{ duration: 0.2 }}
+                      tabIndex={0}
                       onClick={() => {
                         setShowHistory(false);
                         handleSearch(undefined, item.word);
                       }}
-                      className={`p-4 rounded-2xl border transition-all cursor-pointer group flex justify-between items-center ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 hover:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 hover:bg-[#F0FDF8]'}`}
+                      onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                        if (e.key === 'Enter') {
+                          setShowHistory(false);
+                          handleSearch(undefined, item.word);
+                        }
+                      }}
+                      className={`p-4 rounded-2xl border transition-all cursor-pointer group flex justify-between items-center outline-none ${isDarkMode ? 'border-white/10 hover:border-[#10B981]/50 focus:border-[#10B981]/50 hover:bg-white/5 focus:bg-white/5' : 'border-gray-100 hover:border-[#10B981]/30 focus:border-[#10B981]/30 hover:bg-[#F0FDF8] focus:bg-[#F0FDF8]'}`}
                     >
                       <div>
-                        <h4 className={`font-bold text-lg transition-colors ${isDarkMode ? 'text-gray-200 group-hover:text-[#10B981]' : 'text-slate-800 group-hover:text-[#10B981]'}`}>{item.word}</h4>
+                        <h4 className={`font-bold text-lg transition-colors ${isDarkMode ? 'text-gray-200 group-hover:text-[#10B981] group-focus:text-[#10B981]' : 'text-slate-800 group-hover:text-[#10B981] group-focus:text-[#10B981]'}`}>{item.word}</h4>
                         <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                           {new Date(item.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
@@ -3569,12 +3679,12 @@ export default function DictionaryApp() {
                             e.stopPropagation();
                             setSearchHistory(prev => prev.filter(historyItem => historyItem.word !== item.word || historyItem.date !== item.date));
                           }}
-                          className={`p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all ${isDarkMode ? 'hover:bg-red-500/10 text-red-400' : 'hover:bg-red-50 text-red-500'}`}
+                          className={`p-2 rounded-full opacity-0 group-hover:opacity-100 group-focus:opacity-100 group-focus-within:opacity-100 transition-all ${isDarkMode ? 'hover:bg-red-500/10 text-red-400' : 'hover:bg-red-50 text-red-500'}`}
                           title="Remove from history"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <X className="w-4 h-4" />
                         </button>
-                        <ArrowRight className={`w-5 h-5 transition-colors ${isDarkMode ? 'text-gray-600 group-hover:text-[#10B981]' : 'text-gray-300 group-hover:text-[#10B981]'}`} />
+                        <ArrowRight className={`w-5 h-5 transition-colors ${isDarkMode ? 'text-gray-600 group-hover:text-[#10B981] group-focus:text-[#10B981]' : 'text-gray-300 group-hover:text-[#10B981] group-focus:text-[#10B981]'}`} />
                       </div>
                     </motion.div>
                   ))}
@@ -3590,26 +3700,15 @@ export default function DictionaryApp() {
               Vocabulary <span className="text-emerald-500">Quiz</span> 
               <Gamepad2 className="w-8 h-8 text-emerald-500" />
             </h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleSaveSession}
-                disabled={isSavingSession || !user}
-                className={`p-2 rounded-full border transition-colors flex items-center gap-2 px-3 shadow-sm ${!user ? 'opacity-50 cursor-not-allowed hidden sm:flex' : ''} ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-slate-600 hover:bg-gray-50 hover:text-slate-900'}`}
-                title={!user ? 'Sign in to save session' : 'Save Session'}
-              >
-                <Bookmark className="w-4 h-4" />
-                <span className="text-sm font-bold hidden md:inline">Save Session</span>
-              </button>
-              <button
-                onClick={() => {
-                  setShowQuizSettings(true);
-                }}
-                className={`p-2 rounded-full border transition-colors flex items-center gap-2 px-4 shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-slate-600 hover:bg-gray-50 hover:text-slate-900'}`}
-              >
-                <Settings className="w-4 h-4" />
-                <span className="text-sm font-bold hidden sm:inline">Quiz Settings</span>
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                setShowQuizSettings(true);
+              }}
+              className={`p-2 rounded-full border transition-colors flex items-center gap-2 px-4 shadow-sm ${isDarkMode ? 'border-white/10 text-gray-300 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-slate-600 hover:bg-gray-50 hover:text-slate-900'}`}
+            >
+              <Settings className="w-4 h-4" />
+              <span className="text-sm font-bold hidden sm:inline">Quiz Settings</span>
+            </button>
           </div>
 
           <div className={`rounded-[2.5rem] shadow-sm border p-8 ${isDarkMode ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
@@ -3636,11 +3735,11 @@ export default function DictionaryApp() {
                   disabled={savedWords.length < 4}
                   className={`px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all duration-300 ${
                     savedWords.length < 4 
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-white/5 dark:text-gray-600' 
+                      ? (isDarkMode ? 'bg-white/5 text-gray-600 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed') 
                       : 'bg-[#10B981] text-white hover:bg-[#059669] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#10B981]/40'
                   }`}
                 >
-                  <Play className={`w-5 h-5 ${savedWords.length < 4 ? 'fill-gray-400 dark:fill-gray-600' : 'fill-current'}`} /> Start Quiz
+                  <Play className={`w-5 h-5 ${savedWords.length < 4 ? (isDarkMode ? 'fill-gray-600' : 'fill-gray-400') : 'fill-current'}`} /> Start Quiz
                 </button>
               </div>
             )}
@@ -3661,7 +3760,7 @@ export default function DictionaryApp() {
                   </span>
                 </div>
                 
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-8 dark:bg-gray-700">
+                <div className={`w-full rounded-full h-2.5 mb-8 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
                   <div className="bg-[#10B981] h-2.5 rounded-full transition-all duration-500" style={{ width: `${((currentQuizIndex + 1) / quizQuestions.length) * 100}%` }}></div>
                 </div>
 
@@ -3675,15 +3774,21 @@ export default function DictionaryApp() {
                     const isCorrect = option === quizQuestions[currentQuizIndex].correctAnswer;
                     const showResult = selectedAnswer !== null;
 
-                    let btnClass = `p-4 rounded-2xl border-2 text-left font-medium transition-all `;
+                    let btnClass = `p-4 rounded-2xl border-2 text-left font-medium transition-all shadow-sm ${isDarkMode ? 'text-gray-200' : 'text-slate-700'} `;
                     if (!showResult) {
-                      btnClass += isDarkMode ? 'border-white/10 hover:border-emerald-500/50 hover:bg-white/5' : 'border-gray-200 hover:border-emerald-500/50 hover:bg-gray-50';
+                      btnClass += isDarkMode 
+                        ? 'bg-white/5 border-white/10 hover:border-emerald-500/50 hover:bg-white/10' 
+                        : 'bg-white border-gray-200 hover:shadow-md hover:border-emerald-500/50 hover:bg-emerald-50/30 hover:text-emerald-700';
                     } else if (isCorrect) {
-                      btnClass += 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
+                      btnClass += isDarkMode 
+                        ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]' 
+                        : 'border-emerald-500 bg-emerald-100 text-emerald-700 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] font-bold';
                     } else if (isSelected && !isCorrect) {
-                      btnClass += 'border-red-500 bg-red-500/10 text-red-600 dark:text-red-400';
+                      btnClass += isDarkMode 
+                        ? 'border-red-500 bg-red-500/20 text-red-300' 
+                        : 'border-red-500 bg-red-50 text-red-700 font-bold';
                     } else {
-                      btnClass += isDarkMode ? 'border-white/5 opacity-50' : 'border-gray-100 opacity-50';
+                      btnClass += isDarkMode ? 'border-white/5 bg-transparent opacity-40' : 'bg-gray-50 border-gray-100 opacity-50 text-slate-500';
                     }
 
                     return (
@@ -3757,26 +3862,26 @@ export default function DictionaryApp() {
           
           {/* Search Bar */}
           <div className="w-full relative" ref={searchContainerRef}>
-            <form onSubmit={handleSearch} className={`group w-full rounded-[2rem] shadow-sm p-2 flex items-center border transition-all duration-300 ease-out z-20 relative focus-within:-translate-y-1 focus-within:scale-[1.01] focus-within:ring-4 focus-within:ring-[#10B981]/20 ${isDarkMode ? 'bg-[#111] border-white/10 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/50' : 'bg-white border-gray-100 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/30'}`}>
+            <form onSubmit={handleSearch} className={`group w-full rounded-[2rem] shadow-sm p-1 sm:p-2 flex items-center border transition-all duration-300 ease-out z-20 relative focus-within:-translate-y-1 focus-within:scale-[1.01] focus-within:ring-4 focus-within:ring-[#10B981]/20 ${isDarkMode ? 'bg-[#111] border-white/10 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/50' : 'bg-white border-gray-100 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/30'}`}>
               {loading ? (
-                <div className="ml-4 shrink-0 p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
-                  <Loader2 className="w-5 h-5 text-[#10B981] animate-spin" />
+                <div className={`ml-2 sm:ml-4 shrink-0 p-1.5 rounded-full ${isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-100'}`}>
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#10B981] animate-spin" />
                 </div>
               ) : (
-                <Search className="w-6 h-6 text-gray-400 ml-4 shrink-0 transition-colors duration-300 group-focus-within:text-[#10B981]" />
+                <Search className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400 ml-2 sm:ml-4 shrink-0 transition-colors duration-300 group-focus-within:text-[#10B981]" />
               )}
-              <div className="ml-3 shrink-0 flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-0.5">
+              <div className="ml-1 sm:ml-3 shrink-0 flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-0.5">
                 <button
                   type="button"
                   onClick={() => setSearchMode('en')}
-                  className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${searchMode === 'en' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+                  className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-bold rounded-md transition-colors ${searchMode === 'en' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
                 >
                   EN 
                 </button>
                 <button
                   type="button"
                   onClick={() => setSearchMode('bn')}
-                  className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${searchMode === 'bn' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+                  className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-bold rounded-md transition-colors ${searchMode === 'bn' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
                 >
                   BN
                 </button>
@@ -3793,13 +3898,13 @@ export default function DictionaryApp() {
                   if (suggestions.length > 0) setShowSuggestions(true);
                 }}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                className={`min-w-0 flex-1 bg-transparent border-none px-2 sm:px-4 py-4 outline-none text-base sm:text-lg ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-slate-700 placeholder-gray-400'}`} 
-                placeholder={searchMode === 'en' ? "Type any English word..." : "Type any Bengali word..."} 
+                className={`min-w-0 flex-1 w-20 bg-transparent border-none px-2 sm:px-4 py-3 sm:py-4 outline-none text-sm sm:text-lg ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-slate-700 placeholder-gray-400'}`} 
+                placeholder={searchMode === 'en' ? "English word..." : "Bengali word..."} 
                 maxLength={50}
               />
               {searchQuery.length > 0 && (
                 <div className="flex items-center mr-1 sm:mr-2">
-                  <span className={`text-xs mr-2 hidden sm:inline-block ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <span className={`text-xs mr-1 sm:mr-2 hidden md:inline-block ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                     {searchQuery.length}/50
                   </span>
                   <button
@@ -3810,7 +3915,7 @@ export default function DictionaryApp() {
                       setSuggestions([]);
                       setShowSuggestions(false);
                     }}
-                    className={`p-1.5 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
+                    className={`p-1 sm:p-1.5 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
                     title="Clear search"
                   >
                     <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -3820,24 +3925,24 @@ export default function DictionaryApp() {
               <button 
                 type="button" 
                 onClick={toggleListening}
-                className={`p-2 sm:p-3 mr-1 sm:mr-2 rounded-full transition-colors ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : (isDarkMode ? 'text-gray-400 hover:bg-white/10' : 'text-gray-400 hover:bg-gray-100')}`}
+                className={`p-1.5 sm:p-3 mr-1 sm:mr-2 rounded-full transition-colors shrink-0 ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : (isDarkMode ? 'text-gray-400 hover:bg-white/10' : 'text-gray-400 hover:bg-gray-100')}`}
                 title={isListening ? "Stop listening" : "Search by voice"}
               >
-                <Mic className="w-5 h-5" />
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <button 
                 type="submit"
                 disabled={!searchQuery.trim() || loading}
-                className="bg-[#10B981] text-white p-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center hover:bg-[#059669] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#10B981]/40 transition-all duration-300 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-md disabled:hover:shadow-emerald-500/20 shadow-md shadow-emerald-500/20"
+                className="bg-[#10B981] text-white p-2 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center shrink-0 hover:bg-[#059669] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#10B981]/40 transition-all duration-300 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-md disabled:hover:shadow-emerald-500/20 shadow-md shadow-emerald-500/20"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" /> 
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> 
                     <span className="hidden sm:inline-block ml-2">Searching</span>
                   </>
                 ) : (
                   <>
-                    <Search className="w-5 h-5" /> 
+                    <Search className="w-4 h-4 sm:w-5 sm:h-5" /> 
                     <span className="hidden sm:inline-block ml-2">Discover</span>
                   </>
                 )}
@@ -4173,26 +4278,26 @@ export default function DictionaryApp() {
         >
           {/* Search Bar (Top when result is shown) */}
           <div className="w-full relative mb-12" ref={topSearchContainerRef}>
-            <form onSubmit={handleSearch} className={`group w-full rounded-[2rem] shadow-sm p-2 flex items-center border transition-all duration-300 ease-out z-20 relative focus-within:-translate-y-1 focus-within:scale-[1.01] focus-within:ring-4 focus-within:ring-[#10B981]/20 ${isDarkMode ? 'bg-[#111] border-white/10 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/50' : 'bg-white border-gray-100 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/30'}`}>
+            <form onSubmit={handleSearch} className={`group w-full rounded-[2rem] shadow-sm p-1 sm:p-2 flex items-center border transition-all duration-300 ease-out z-20 relative focus-within:-translate-y-1 focus-within:scale-[1.01] focus-within:ring-4 focus-within:ring-[#10B981]/20 ${isDarkMode ? 'bg-[#111] border-white/10 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/50' : 'bg-white border-gray-100 focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.15)] focus-within:border-[#10B981]/30'}`}>
               {loading ? (
-                <div className="ml-4 shrink-0 p-1 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
-                  <Loader2 className="w-5 h-5 text-[#10B981] animate-spin" />
+                <div className={`ml-2 sm:ml-4 shrink-0 p-1 rounded-full ${isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-100'}`}>
+                  <Loader2 className="w-4 h-4 sm:w-5 h-5 text-[#10B981] animate-spin" />
                 </div>
               ) : (
-                <Search className="w-6 h-6 text-gray-400 ml-4 shrink-0 transition-colors duration-300 group-focus-within:text-[#10B981]" />
+                <Search className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400 ml-2 sm:ml-4 shrink-0 transition-colors duration-300 group-focus-within:text-[#10B981]" />
               )}
-              <div className="ml-3 shrink-0 flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-0.5">
+              <div className="ml-1 sm:ml-3 shrink-0 flex items-center bg-gray-100 dark:bg-white/10 rounded-lg p-0.5">
                 <button
                   type="button"
                   onClick={() => setSearchMode('en')}
-                  className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${searchMode === 'en' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+                  className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-bold rounded-md transition-colors ${searchMode === 'en' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
                 >
                   EN
                 </button>
                 <button
                   type="button"
                   onClick={() => setSearchMode('bn')}
-                  className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${searchMode === 'bn' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
+                  className={`px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs font-bold rounded-md transition-colors ${searchMode === 'bn' ? 'bg-white text-emerald-600 shadow-sm dark:bg-[#111] dark:text-emerald-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'}`}
                 >
                   BN
                 </button>
@@ -4209,13 +4314,13 @@ export default function DictionaryApp() {
                   if (suggestions.length > 0) setShowSuggestions(true);
                 }}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                className={`flex-1 bg-transparent border-none px-4 py-3 outline-none text-lg ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-slate-700 placeholder-gray-400'}`} 
-                placeholder={searchMode === 'en' ? "Type any English word..." : "Type any Bengali word..."} 
+                className={`min-w-0 flex-1 w-20 bg-transparent border-none px-2 sm:px-4 py-3 outline-none text-sm sm:text-lg ${isDarkMode ? 'text-white placeholder-gray-500' : 'text-slate-700 placeholder-gray-400'}`} 
+                placeholder={searchMode === 'en' ? "English word..." : "Bengali word..."} 
                 maxLength={50}
               />
               {searchQuery.length > 0 && (
                 <div className="flex items-center mr-1 sm:mr-2">
-                  <span className={`text-xs mr-2 hidden sm:inline-block ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <span className={`text-xs mr-2 hidden md:inline-block ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                     {searchQuery.length}/50
                   </span>
                   <button
@@ -4226,7 +4331,7 @@ export default function DictionaryApp() {
                       setSuggestions([]);
                       setShowSuggestions(false);
                     }}
-                    className={`p-1.5 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
+                    className={`p-1 sm:p-1.5 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-white/10 hover:text-white' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'}`}
                     title="Clear search"
                   >
                     <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -4236,18 +4341,18 @@ export default function DictionaryApp() {
               <button 
                 type="button" 
                 onClick={toggleListening}
-                className={`p-2 sm:p-2 mr-1 sm:mr-2 rounded-full transition-colors ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : (isDarkMode ? 'text-gray-400 hover:bg-white/10' : 'text-gray-400 hover:bg-gray-100')}`}
+                className={`p-1.5 sm:p-2 mr-1 sm:mr-2 rounded-full transition-colors shrink-0 ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : (isDarkMode ? 'text-gray-400 hover:bg-white/10' : 'text-gray-400 hover:bg-gray-100')}`}
                 title={isListening ? "Stop listening" : "Search by voice"}
               >
-                <Mic className="w-5 h-5" />
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <button 
                 type="submit"
                 disabled={!searchQuery.trim() || loading}
-                className="bg-[#10B981] text-white px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-[#059669] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#10B981]/40 transition-all duration-300 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-md disabled:hover:shadow-emerald-500/20 shadow-md shadow-emerald-500/20"
+                className="bg-[#10B981] text-white p-2 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center shrink-0 hover:bg-[#059669] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#10B981]/40 transition-all duration-300 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-md disabled:hover:shadow-emerald-500/20 shadow-md shadow-emerald-500/20"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin sm:hidden" /> : <Search className="w-5 h-5 sm:hidden" />}
-                <span className="hidden sm:inline-block">{loading ? 'Searching...' : 'Discover'}</span>
+                {loading ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin sm:hidden" /> : <Search className="w-4 h-4 sm:w-5 sm:h-5 sm:hidden" />}
+                <span className="hidden sm:inline-block ml-2">{loading ? 'Searching...' : 'Discover'}</span>
               </button>
             </form>
 
@@ -4478,7 +4583,7 @@ export default function DictionaryApp() {
                   {isAnalyzingAudio && (
                     <div className="mt-4 flex items-center justify-center py-4 bg-indigo-500/10 rounded-xl">
                       <Loader2 className="w-5 h-5 animate-spin text-indigo-500 mr-2" />
-                      <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">AI is analyzing your pronunciation...</span>
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>AI is analyzing your pronunciation...</span>
                     </div>
                   )}
                   {!isAnalyzingAudio && pronunciationScore && (
@@ -4500,14 +4605,14 @@ export default function DictionaryApp() {
                             <span className={`text-3xl font-black font-outfit ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
                               {pronunciationScore.score}
                             </span>
-                            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>/10</span>
+                            <span className={`text-sm font-bold ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>%</span>
                           </div>
                         </div>
 
                         <div className={`w-full h-2.5 rounded-full overflow-hidden ${isDarkMode ? 'bg-black/40' : 'bg-white/60'} shadow-inner`}>
                           <motion.div 
                             initial={{ width: 0 }}
-                            animate={{ width: `${(pronunciationScore.score / 10) * 100}%` }}
+                            animate={{ width: `${pronunciationScore.score}%` }}
                             transition={{ duration: 1, ease: "easeOut" }}
                             className={`h-full rounded-full ${pronunciationScore.isCorrect ? 'bg-emerald-500' : 'bg-amber-500'} relative`}
                           >
@@ -4515,10 +4620,26 @@ export default function DictionaryApp() {
                           </motion.div>
                         </div>
 
-                        <div className={`p-4 rounded-xl mt-1 ${isDarkMode ? 'bg-white/5' : 'bg-white/60'} backdrop-blur-sm`}>
-                          <p className={`text-sm md:text-base font-medium leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                        <div className={`p-4 rounded-xl mt-1 flex flex-col gap-3 ${isDarkMode ? 'bg-white/5' : 'bg-white/60'} backdrop-blur-sm`}>
+                          {pronunciationScore.phoneticTranscription && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold uppercase tracking-wider text-emerald-500">You said:</span>
+                              <span className={`font-mono text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>/{pronunciationScore.phoneticTranscription}/</span>
+                            </div>
+                          )}
+                          <p className={`text-sm md:text-base font-medium leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>
                             {pronunciationScore.feedback}
                           </p>
+                          {pronunciationScore.specificTips && pronunciationScore.specificTips.length > 0 && (
+                            <div className="mt-2 text-sm">
+                              <span className={`font-bold mb-2 block ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>Improvement Tips:</span>
+                              <ul className="list-disc pl-5 space-y-1">
+                                {pronunciationScore.specificTips.map((tip: string, idx: number) => (
+                                  <li key={idx} className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>{tip}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -4561,9 +4682,18 @@ export default function DictionaryApp() {
                   <div className={`absolute -right-4 -top-4 opacity-5 ${isDarkMode ? 'text-blue-500' : 'text-blue-900'}`}>
                     <BookOpen className="w-32 h-32" />
                   </div>
-                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
-                    <BookOpen className="w-4 h-4" /> Simple English Meaning
-                  </h4>
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className={`text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                      <BookOpen className="w-4 h-4" /> Simple English Meaning
+                    </h4>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); playPronunciation(result.englishDefinition); }}
+                      className={`p-2 rounded-full transition-all shrink-0 ${isSpeaking ? 'animate-pulse' : ''} ${isDarkMode ? 'hover:bg-blue-500/20 text-blue-400' : 'hover:bg-blue-200 text-blue-600'}`}
+                      title="Listen to meaning directly"
+                    >
+                      <Volume2 className="w-5 h-5" />
+                    </button>
+                  </div>
                   <p className={`text-xl font-medium leading-relaxed relative z-10 ${isDarkMode ? 'text-blue-200' : 'text-blue-900'}`}>
                     {result.englishDefinition}
                   </p>
@@ -5002,6 +5132,24 @@ export default function DictionaryApp() {
                             ))}
                           </div>
                         )}
+                        {(item.notes || (item.customExamples && item.customExamples.length > 0)) && (
+                          <div className={`mt-3 pt-3 border-t flex flex-col gap-2 ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
+                            {item.notes && (
+                              <div className={`text-xs italic ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+                                📝 {item.notes}
+                              </div>
+                            )}
+                            {item.customExamples && item.customExamples.length > 0 && (
+                              <div className="flex flex-col gap-1">
+                                {item.customExamples.map((ex, exIdx) => (
+                                  <div key={exIdx} className={`text-xs flex items-start gap-1 font-medium ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                    <span className="opacity-70">&bull;</span> {ex}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <ArrowRight className={`w-5 h-5 shrink-0 ml-4 transition-colors ${isDarkMode ? 'text-gray-600 group-hover:text-[#10B981]' : 'text-gray-300 group-hover:text-[#10B981]'}`} />
@@ -5207,7 +5355,7 @@ export default function DictionaryApp() {
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/10 flex gap-3">
+              <div className={`mt-8 pt-6 border-t flex gap-3 ${isDarkMode ? 'border-white/10' : 'border-gray-200'}`}>
                 <button
                   onClick={() => setShowQuizSettings(false)}
                   className={`flex-1 py-3 rounded-xl font-bold transition-colors ${isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
@@ -5248,7 +5396,7 @@ export default function DictionaryApp() {
               <div className="space-y-8 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                 {/* General Settings */}
                 <div className="space-y-4">
-                  <h4 className={`text-lg font-bold border-b pb-2 ${isDarkMode ? 'text-white border-white/10' : 'text-slate-800 border-gray-100'}`}>Learning Goals</h4>
+                  <h4 className={`text-lg font-bold border-b pb-2 ${isDarkMode ? 'text-white border-white/10' : 'text-slate-800 border-gray-100'}`}>Learning Goals & Reminders</h4>
                   
                   <div>
                     <label className={`flex items-center gap-2 text-sm font-bold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
@@ -5270,6 +5418,30 @@ export default function DictionaryApp() {
                       }}
                       className={`w-full p-3 rounded-xl border focus:ring-2 focus:ring-[#10B981] outline-none ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-slate-800'}`}
                     />
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-2">
+                    <label className={`flex items-center gap-2 text-sm font-bold ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                      Daily Study Reminders
+                      <div className="relative group">
+                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 rounded-xl text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${isDarkMode ? 'bg-gray-800 text-gray-200 border border-gray-700' : 'bg-white text-slate-600 border border-gray-100'}`}>
+                          Enable to get a browser notification or in-app reminder when you have words due for review.
+                        </div>
+                      </div>
+                    </label>
+                    <button
+                      onClick={async () => {
+                        const newState = !userStats.dailyReminders;
+                        setUserStats(prev => ({...prev, dailyReminders: newState}));
+                        if (newState && "Notification" in window && Notification.permission === "default") {
+                          await Notification.requestPermission();
+                        }
+                      }}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${userStats.dailyReminders ? 'bg-[#10B981]' : (isDarkMode ? 'bg-gray-700' : 'bg-gray-300')}`}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${userStats.dailyReminders ? 'translate-x-6' : 'translate-x-1'}`} />
+                    </button>
                   </div>
                 </div>
 
