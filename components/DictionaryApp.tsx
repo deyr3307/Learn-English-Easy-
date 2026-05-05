@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Search, Volume2, Bookmark, Menu, Sun, Moon, RefreshCw, Quote, ArrowRight, Lightbulb, History, Trash2, Leaf, TrendingUp, Settings, X, ThumbsUp, ThumbsDown, Flag, CheckCircle, Mic, Download, WifiOff, Brain, Play, Video, Info, Languages, Book, BookOpen, Link, Gamepad2, Tag, Copy, Check, Loader2, ImageIcon, MessageCircle, Share2, AlertTriangle, Calendar, FileText } from 'lucide-react';
+import { Search, Volume2, Bookmark, Menu, Sun, Star, Moon, RefreshCw, Quote, ArrowRight, Lightbulb, History, Trash2, Leaf, TrendingUp, Settings, X, ThumbsUp, ThumbsDown, Flag, CheckCircle, Mic, Download, WifiOff, Brain, Play, Video, Info, Languages, Book, BookOpen, Link, Gamepad2, Tag, Copy, Check, Loader2, ImageIcon, MessageCircle, Share2, AlertTriangle, Calendar, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import Image from 'next/image';
@@ -22,6 +22,7 @@ interface WordDetails {
   bengaliMeaning: string;
   englishDefinition: string;
   partOfSpeech: string;
+  variations?: string[]; // E.g., plural forms, past tense, etc.
   exampleSentence?: string; // Kept for backward compatibility
   exampleSentences?: string[]; // Array of 3 reliable, conversational examples
   examples?: { english: string; bengali: string; context?: string; }[]; // Structured translation examples
@@ -81,11 +82,22 @@ const highlightWord = (text: string, targetWord: string, isDarkMode: boolean) =>
   const parts = text.split(regex);
   return (
     <>
-      {parts.map((part, i) => 
-        i % 2 === 1 ? 
-          <span key={i} className={`font-bold px-1 rounded ${isDarkMode ? 'text-emerald-300 bg-emerald-900/40' : 'text-emerald-700 bg-emerald-200/50'}`}>{part}</span> : 
-          part
-      )}
+      {parts.map((part, i) => {
+        if (i % 2 === 1) {
+          const isVariation = part.toLowerCase() !== targetWord.toLowerCase();
+          return (
+            <span key={i} className={`font-bold px-1 rounded inline-flex items-baseline ${isDarkMode ? 'text-emerald-300 bg-emerald-900/40' : 'text-emerald-700 bg-emerald-200/50'}`}>
+              {part}
+              {isVariation && (
+                <span className={`ml-1 text-[10px] sm:text-xs font-medium tracking-wide ${isDarkMode ? 'text-emerald-400/60' : 'text-emerald-700/60'}`}>
+                  ({targetWord})
+                </span>
+              )}
+            </span>
+          );
+        }
+        return <React.Fragment key={i}>{part}</React.Fragment>;
+      })}
     </>
   );
 };
@@ -108,6 +120,7 @@ interface Suggestion {
   word: string;
   definition: string;
   category?: string;
+  isSaved?: boolean;
 }
 
 interface SearchHistoryItem {
@@ -283,6 +296,8 @@ export default function DictionaryApp() {
   const [transcriptionFeedback, setTranscriptionFeedback] = useState<{confidence: string, alternatives: string[]} | null>(null);
   const [savedWords, setSavedWords] = useState<SavedWord[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [flashcardImage, setFlashcardImage] = useState<string | null>(null);
+  const [isGeneratingFlashcard, setIsGeneratingFlashcard] = useState(false);
 
   const [userStats, setUserStats] = useState<UserStats>({
     wordsLearned: 0,
@@ -406,7 +421,7 @@ export default function DictionaryApp() {
     startingEase: 2.5,
     learnedThreshold: 21
   });
-  const [showSrsSettings, setShowSrsSettings] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [speechRate, setSpeechRate] = useState(0.9);
   const [selectedVoiceURI, setSelectedVoiceURI] = useState('');
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -855,6 +870,7 @@ export default function DictionaryApp() {
                 englishDefinition: { type: Type.STRING, description: "A very simple, easy-to-understand English definition, suitable for language learners in plain English." },
                 synonyms: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 to 5 simple English synonyms for the word." },
                 relatedWords: { type: Type.ARRAY, items: { type: Type.STRING }, description: "5 words that are semantically related or commonly used together with the searched word." },
+                variations: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Common variations of the word, like plural forms (e.g., 'apples' for 'apple'), past tense ('walked' for 'walk'), or comparative/superlative forms ('bigger', 'biggest')." },
                 partOfSpeech: { type: Type.STRING, description: "e.g., NOUN, VERB, ADJECTIVE (all caps)" },
                 examples: { 
                   type: Type.ARRAY, 
@@ -884,7 +900,7 @@ export default function DictionaryApp() {
                 dailySpeakingTip: { type: Type.STRING, description: "A short tip on how to use this word. Provide this entirely in Bengali." },
                 difficultyLevel: { type: Type.STRING, description: "The difficulty level of the word: Beginner, Intermediate, or Advanced" }
               },
-              required: ["word", "phonetic", "bengaliMeaning", "englishDefinition", "synonyms", "relatedWords", "partOfSpeech", "examples", "speakingTips", "dailySpeakingTip", "difficultyLevel"]
+              required: ["word", "phonetic", "bengaliMeaning", "englishDefinition", "synonyms", "relatedWords", "variations", "partOfSpeech", "examples", "speakingTips", "dailySpeakingTip", "difficultyLevel"]
             }
           }
         });
@@ -996,9 +1012,39 @@ export default function DictionaryApp() {
       
       setSuggestionsLoading(true);
       try {
+        const queryLower = searchQuery.toLowerCase();
+        
+        // 1. Get local suggestions from savedWords
+        const localMatchesRaw = savedWords.filter(w => {
+          if (searchMode === 'en') {
+            return w.word.toLowerCase().startsWith(queryLower) || w.word.toLowerCase().includes(queryLower);
+          } else {
+            return w.bengaliMeaning?.includes(queryLower) || w.englishDefinition?.toLowerCase().includes(queryLower);
+          }
+        });
+
+        const localMatches = localMatchesRaw.map(w => ({
+          word: w.word,
+          definition: w.englishDefinition || '',
+          category: w.partOfSpeech || '',
+          isSaved: true,
+          easeFactor: w.srs?.easeFactor || 2.5,
+          nextReviewDate: w.srs?.nextReviewDate || new Date().toISOString()
+        }));
+
+        // Rank local matches: Priority to due words, then lower ease factor (harder words)
+        const now = new Date().getTime();
+        localMatches.sort((a, b) => {
+          const aDue = new Date(a.nextReviewDate).getTime() <= now ? 1 : 0;
+          const bDue = new Date(b.nextReviewDate).getTime() <= now ? 1 : 0;
+          if (aDue !== bDue) return bDue - aDue;
+          return a.easeFactor - b.easeFactor;
+        });
+
+        // 2. Get AI suggestions
         const suggestionPrompt = searchMode === 'en'
-          ? `Provide 5 relevant English word suggestions for the prefix "${searchQuery}". For each, provide a short definition and a category (e.g., Noun, Verb, Adjective).`
-          : `Provide 5 English translations or words related to the Bengali concept/word "${searchQuery}". Give the English word, its English definition, and a category (Noun, Verb, Adjective).`;
+          ? `Provide 5 relevant English word suggestions for the prefix/query "${searchQuery}". Prioritize high-frequency and commonly used vocabulary in everyday English. For each, provide a short definition and a category (e.g., Noun, Verb, Adjective).`
+          : `Provide 5 English translations or words related to the Bengali concept/word "${searchQuery}". Prioritize high-frequency English vocabulary. Give the English word, its English definition, and a category (Noun, Verb, Adjective).`;
 
         const res = await ai.models.generateContent({
           model: "gemini-3-flash-preview",
@@ -1019,9 +1065,32 @@ export default function DictionaryApp() {
             }
           }
         });
+
         if (res.text) {
-          const data = JSON.parse(res.text);
-          setSuggestions(data);
+          const aiSuggestions = JSON.parse(res.text) as Suggestion[];
+          
+          // Merge local and AI suggestions
+          const merged: Suggestion[] = [];
+          const seenWords = new Set<string>();
+
+          // Add up to 3 top local matches first
+          for (const match of localMatches.slice(0, 3)) {
+            if (!seenWords.has(match.word.toLowerCase())) {
+              merged.push({ word: match.word, definition: match.definition, category: match.category, isSaved: true });
+              seenWords.add(match.word.toLowerCase());
+            }
+          }
+
+          // Fill the rest with AI suggestions (up to 7 max total)
+          for (const sug of aiSuggestions) {
+            if (merged.length >= 7) break;
+            if (!seenWords.has(sug.word.toLowerCase())) {
+              merged.push(sug);
+              seenWords.add(sug.word.toLowerCase());
+            }
+          }
+
+          setSuggestions(merged);
           setShowSuggestions(true);
           setSelectedSuggestionIndex(-1);
         }
@@ -1034,7 +1103,7 @@ export default function DictionaryApp() {
 
     const timeoutId = setTimeout(fetchSuggestions, 500);
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, searchMode]);
+  }, [searchQuery, searchMode, savedWords]);
 
   const toggleListening = async () => {
     if (isListening) {
@@ -1172,9 +1241,13 @@ export default function DictionaryApp() {
 
   const fetchWordData = async (wordToFetch: string, lang: 'en' | 'bn' = 'en'): Promise<WordDetails | null> => {
     try {
+      const promptInfo = `
+Provide the dictionary details for the target English word.
+When generating the 5 example sentences in the 'examples' array, you MUST prioritize practical, easy-to-understand conversational examples emphasizing real-life situations. Avoid overly formal or poetic examples unless appropriate. Use extremely natural phrasing that a native speaker uses in daily conversation. Ensure each example is accompanied by an exact Bengali translation.
+`;
       const prompt = lang === 'en' 
-        ? `Provide the dictionary details for the English word "${wordToFetch}". If the input seems misspelled or is not a valid English word, set 'isMisspelled' to true, provide up to 3 spellcheck suggestions in 'spellcheckSuggestions', and provide the dictionary details for the most likely intended English word in the 'word' field and subsequent fields.`
-        : `The user provided the phrase "${wordToFetch}" (likely Bengali). Find the most accurate single English translation. Provide the full dictionary details for that English word. Make sure the 'word' field is the English translation.`;
+        ? `${promptInfo}\nThe user searched for the English word "${wordToFetch}". If the input seems misspelled or is not a valid English word, set 'isMisspelled' to true, provide up to 3 spellcheck suggestions in 'spellcheckSuggestions', and provide the dictionary details for the most likely intended English word in the 'word' field and subsequent fields.`
+        : `${promptInfo}\nThe user provided the phrase "${wordToFetch}" (likely Bengali). Find the most accurate single English translation. Provide the full dictionary details for that English word. Make sure the 'word' field is the English translation.`;
         
       const textResponse = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
@@ -1190,6 +1263,7 @@ export default function DictionaryApp() {
               englishDefinition: { type: Type.STRING, description: "A very simple, easy-to-understand English definition, suitable for language learners in plain English." },
               synonyms: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 to 5 simple English synonyms for the word." },
               relatedWords: { type: Type.ARRAY, items: { type: Type.STRING }, description: "5 words that are semantically related or commonly used together with the searched word." },
+              variations: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Common variations of the word, like plural forms (e.g., 'apples' for 'apple'), past tense ('walked' for 'walk'), or comparative/superlative forms ('bigger', 'biggest')." },
               partOfSpeech: { type: Type.STRING, description: "e.g., NOUN, VERB, ADJECTIVE (all caps)" },
               isMisspelled: { type: Type.BOOLEAN, description: "Set to true ONLY if the originally requested English word was misspelled. Otherwise, false." },
               spellcheckSuggestions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "If isMisspelled is true, provide 1 to 3 alternate valid English words. Otherwise, an empty array." },
@@ -1221,7 +1295,7 @@ export default function DictionaryApp() {
               dailySpeakingTip: { type: Type.STRING, description: "An overall practical advice in Bengali on how to use this word in daily life effortlessly." },
               difficultyLevel: { type: Type.STRING, description: "The difficulty level of the word: Beginner, Intermediate, or Advanced" }
             },
-            required: ["word", "phonetic", "bengaliMeaning", "englishDefinition", "synonyms", "relatedWords", "partOfSpeech", "examples", "speakingTips", "dailySpeakingTip", "difficultyLevel", "isMisspelled", "spellcheckSuggestions"]
+            required: ["word", "phonetic", "bengaliMeaning", "englishDefinition", "synonyms", "relatedWords", "variations", "partOfSpeech", "examples", "speakingTips", "dailySpeakingTip", "difficultyLevel", "isMisspelled", "spellcheckSuggestions"]
           }
         }
       });
@@ -1908,13 +1982,83 @@ export default function DictionaryApp() {
   };
 
   const updateSavedWordTags = (word: string, tagsStr: string) => {
-    const tags = tagsStr.split(',').map(t => t.trim()).filter(t => t);
+    const tags = Array.from(new Set(tagsStr.split(',').map(t => t.trim().toLowerCase()).filter(t => t)));
     setSavedWords(prev => prev.map(w => w.word.toLowerCase() === word.toLowerCase() ? { ...w, tags } : w));
   };
+
+  const addSavedWordTag = (word: string, tag: string) => {
+    setSavedWords(prev => prev.map(w => {
+      if (w.word.toLowerCase() === word.toLowerCase()) {
+        const currentTags = w.tags || [];
+        const normalizedTag = tag.trim().toLowerCase();
+        if (normalizedTag && !currentTags.includes(normalizedTag)) {
+          return { ...w, tags: [...currentTags, normalizedTag] };
+        }
+      }
+      return w;
+    }));
+  };
+
+  const removeSavedWordTag = (word: string, tagToRemove: string) => {
+    setSavedWords(prev => prev.map(w => {
+      if (w.word.toLowerCase() === word.toLowerCase()) {
+        const currentTags = w.tags || [];
+        return { ...w, tags: currentTags.filter(t => t !== tagToRemove) };
+      }
+      return w;
+    }));
+  };
+
+  useEffect(() => {
+    setFlashcardImage(null);
+  }, [result?.word, currentReviewWord?.word]);
 
   const updateSavedWordExamples = (word: string, examplesStr: string) => {
     const customExamples = examplesStr.split('\n').map(e => e.trim()).filter(e => e);
     setSavedWords(prev => prev.map(w => w.word.toLowerCase() === word.toLowerCase() ? { ...w, customExamples } : w));
+  };
+
+  const generateFlashcardImage = async (overrideWord?: string, overrideDef?: string) => {
+    const targetWord = overrideWord || result?.word || currentReviewWord?.word;
+    const targetDef = overrideDef || result?.englishDefinition || currentReviewWord?.englishDefinition;
+    
+    if (!targetWord) return;
+    setIsGeneratingFlashcard(true);
+    try {
+      const prompt = `Create an illustration representing the word "${targetWord}". The art style should be cartoonish+realistic type but not childish. Depict a scene that clearly explains the meaning of "${targetWord}" (${targetDef || ''}).`;
+      
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+          parts: [{ text: prompt }]
+        },
+        config: {
+          imageConfig: {
+            aspectRatio: "1:1"
+          }
+        }
+      });
+      
+      let imageUrl = null;
+      for (const part of response.candidates?.[0]?.content?.parts || []) {
+        if (part.inlineData) {
+          const base64EncodeString = part.inlineData.data;
+          imageUrl = `data:image/png;base64,${base64EncodeString}`;
+          break;
+        } 
+      }
+      
+      if (imageUrl) {
+        setFlashcardImage(imageUrl);
+      } else {
+        alert("Failed to generate image. Please try again.");
+      }
+    } catch (error) {
+      console.error("AI Image Generation failed:", error);
+      alert("Network or AI service error while generating image.");
+    } finally {
+      setIsGeneratingFlashcard(false);
+    }
   };
 
   const generateExampleForWord = async (word: SavedWord) => {
@@ -2094,6 +2238,28 @@ export default function DictionaryApp() {
       setReviewMode('none');
       setCurrentReviewWord(null);
     }
+  };
+
+  const handleNextFlashcard = () => {
+    if (reviewQueue.length <= 1) return;
+    const current = reviewQueue[0];
+    const newQueue = [...reviewQueue.slice(1), current];
+    setReviewQueue(newQueue);
+    setUserAudioUrl(null);
+    setCurrentReviewWord(newQueue[0]);
+    setReviewMode('front');
+    setReviewGuess('');
+  };
+
+  const handlePrevFlashcard = () => {
+    if (reviewQueue.length <= 1) return;
+    const last = reviewQueue[reviewQueue.length - 1];
+    const newQueue = [last, ...reviewQueue.slice(0, -1)];
+    setReviewQueue(newQueue);
+    setUserAudioUrl(null);
+    setCurrentReviewWord(newQueue[0]);
+    setReviewMode('front');
+    setReviewGuess('');
   };
 
   const handleManualReview = (rating: 'Again' | 'Hard' | 'Good' | 'Easy') => {
@@ -2330,18 +2496,12 @@ export default function DictionaryApp() {
           >
             {/* Track background icons */}
             <div className="absolute inset-0 flex items-center justify-between px-1.5 pointer-events-none">
-              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`}>
-                <Moon className="w-4 h-4 text-emerald-400" />
-              </span>
-              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`}>
-                <Sun className="w-4 h-4 text-amber-500" />
-              </span>
+              <span className={`text-[10px] ${isDarkMode ? 'opacity-50' : 'opacity-100'}`}>⭐</span>
+              <span className={`text-[10px] ${isDarkMode ? 'opacity-100' : 'opacity-50'}`}>🌙</span>
             </div>
             
             {/* Sliding thumb */}
-            <div className={`relative w-6 h-6 rounded-full shadow-sm flex items-center justify-center transition-all duration-500 z-10 ${isDarkMode ? 'translate-x-8 bg-slate-800 border border-slate-600' : 'translate-x-0 bg-white border border-slate-100'}`}>
-              <Moon className={`absolute w-3.5 h-3.5 text-emerald-400 transition-all duration-500 ${isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} />
-              <Sun className={`absolute w-3.5 h-3.5 text-amber-500 transition-all duration-500 ${isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} />
+            <div className={`relative w-6 h-6 rounded-full shadow-md transition-transform duration-500 z-10 ${isDarkMode ? 'translate-x-8 bg-slate-800 border-2 border-slate-600' : 'translate-x-0 bg-white border-2 border-slate-100'}`}>
             </div>
           </button>
           <button 
@@ -2418,7 +2578,7 @@ export default function DictionaryApp() {
           </button>
           <button 
             onClick={() => {
-              setShowSrsSettings(true);
+              setShowSettings(true);
             }}
             className={`p-2 transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100' : 'text-slate-600 hover:text-slate-900'}`}
             title="Settings - Configure app preferences"
@@ -2453,18 +2613,12 @@ export default function DictionaryApp() {
           >
             {/* Track background icons */}
             <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
-              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`}>
-                <Moon className="w-3.5 h-3.5 text-emerald-400" />
-              </span>
-              <span className={`transition-opacity duration-500 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`}>
-                <Sun className="w-3.5 h-3.5 text-amber-500" />
-              </span>
+              <span className={`text-[10px] ${isDarkMode ? 'opacity-50' : 'opacity-100'}`}>⭐</span>
+              <span className={`text-[10px] ${isDarkMode ? 'opacity-100' : 'opacity-50'}`}>🌙</span>
             </div>
             
             {/* Sliding thumb */}
-            <div className={`relative w-5 h-5 rounded-full shadow-sm flex items-center justify-center transition-all duration-500 z-10 ${isDarkMode ? 'translate-x-7 bg-slate-800 border border-slate-600' : 'translate-x-0 bg-white border border-slate-100'}`}>
-              <Moon className={`absolute w-3 h-3 text-emerald-400 transition-all duration-500 ${isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} />
-              <Sun className={`absolute w-3 h-3 text-amber-500 transition-all duration-500 ${isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} />
+            <div className={`relative w-5 h-5 rounded-full shadow-md transition-transform duration-500 z-10 ${isDarkMode ? 'translate-x-7 bg-slate-800 border-2 border-slate-600' : 'translate-x-0 bg-white border-2 border-slate-100'}`}>
             </div>
           </button>
           <button 
@@ -2566,7 +2720,7 @@ export default function DictionaryApp() {
             <button 
               onClick={() => {
                 setShowMobileMenu(false);
-                setShowSrsSettings(true);
+                setShowSettings(true);
               }}
               className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-gray-50 text-slate-700'}`}
             >
@@ -2838,33 +2992,61 @@ export default function DictionaryApp() {
               </div>
             )}
             
-            <div className="w-full max-w-xl mx-auto mt-8 h-[450px]" style={{ perspective: 1000 }}>
-              <motion.div
-                className="w-full h-full relative"
-                initial={false}
-                animate={{ rotateY: reviewMode === 'back' ? 180 : 0 }}
-                transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
-                style={{ transformStyle: 'preserve-3d' }}
+            <div className="relative w-full max-w-5xl mx-auto flex items-center justify-center gap-2 sm:gap-6 mt-8">
+              <button 
+                onClick={(e) => { e.stopPropagation(); handlePrevFlashcard(); }}
+                disabled={reviewQueue.length <= 1}
+                className={`p-3 rounded-full transition-all flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-white/80 hover:bg-white text-slate-800 shadow-md'}`}
               >
-                {/* Front (English Word) */}
-                <div 
-                  className={`absolute w-full h-full rounded-[3rem] shadow-lg border flex flex-col items-center justify-center p-8 bg-gradient-to-br transition-shadow ${isDarkMode ? 'from-[#1A1A1A] to-[#111] border-white/10' : 'from-white to-emerald-50/50 border-emerald-100'}`}
-                  style={{ backfaceVisibility: 'hidden' }}
+                <ChevronLeft className="w-8 h-8" />
+              </button>
+              
+              <div className="w-full max-w-4xl flex-shrink-0 h-[640px]" style={{ perspective: 1000 }}>
+                <motion.div
+                  className="w-full h-full relative"
+                  initial={false}
+                  animate={{ rotateY: reviewMode === 'back' ? 180 : 0 }}
+                  transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
+                  style={{ transformStyle: 'preserve-3d' }}
                 >
-                  <p className={`text-sm font-bold uppercase tracking-widest mb-8 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>Review Mode</p>
+                  {/* Front (English Word) */}
+                  <div 
+                    className={`absolute w-full h-full rounded-[3rem] shadow-lg border flex flex-col items-center justify-center p-10 md:p-12 bg-gradient-to-br transition-shadow cursor-pointer ${isDarkMode ? 'from-[#1A1A1A] to-[#111] border-white/10 hover:shadow-white/5' : 'from-white to-emerald-50/50 border-emerald-100 hover:shadow-emerald-500/10'}`}
+                    style={{ backfaceVisibility: 'hidden' }}
+                    onClick={() => reviewMode === 'front' && setReviewMode('back')}
+                  >
+                  <p className={`text-sm font-bold uppercase tracking-widest mb-2 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>Review Mode</p>
+                  <p className={`text-xs opacity-60 mb-6 ${isDarkMode ? 'text-gray-500' : 'text-slate-400'}`}>Click anywhere to flip</p>
                   
                   <h3 className={`text-5xl md:text-6xl font-black font-outfit mb-4 text-center ${isDarkMode ? 'text-white text-3d-sm' : 'text-slate-800 text-3d-sm'}`}>
                     {currentReviewWord.word}
                   </h3>
                   
-                  <div className={`inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-xl shadow-inner border ${isDarkMode ? 'bg-[#212f45]/50 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
+                  <div className={`inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-xl shadow-inner border ${isDarkMode ? 'bg-[#212f45]/50 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
                     <Volume2 className="w-5 h-5 opacity-70" />
                     <span className="font-mono text-xl font-medium tracking-wider">{currentReviewWord.phonetic}</span>
                   </div>
 
-                  <div className="w-full max-w-sm flex flex-col gap-4">
+                  <div onClick={(e) => e.stopPropagation()} className="mb-6 flex flex-col items-center">
+                    {flashcardImage ? (
+                      <div className={`relative w-48 h-48 sm:w-56 sm:h-56 rounded-2xl overflow-hidden border-4 shadow-lg ${isDarkMode ? 'border-gray-800' : 'border-white'}`}>
+                        <Image src={flashcardImage} alt={`Flashcard for ${currentReviewWord.word}`} fill className="object-cover" />
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={() => generateFlashcardImage(currentReviewWord?.word, currentReviewWord?.englishDefinition)}
+                        disabled={isGeneratingFlashcard}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${isDarkMode ? 'bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 border border-sky-500/30' : 'bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200'} ${isGeneratingFlashcard ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                       {isGeneratingFlashcard ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                       {isGeneratingFlashcard ? 'Generating...' : 'Generate Image'}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="w-full max-w-sm flex flex-col gap-4 relative z-10" onClick={(e) => e.stopPropagation()}>
                     <div className="flex flex-col gap-2">
-                      <label className={`text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Recall Meaning</label>
+                      <label className={`text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>Recall Meaning (Optional)</label>
                       <input
                         type="text"
                         value={reviewGuess}
@@ -2881,7 +3063,7 @@ export default function DictionaryApp() {
                     
                     <button 
                       onClick={() => reviewMode === 'front' && setReviewMode('back')}
-                      className="w-full py-3 bg-[#10B981] text-white rounded-xl font-bold hover:bg-[#059669] transition-colors"
+                      className="w-full py-3 bg-[#10B981] text-white rounded-xl font-bold hover:bg-[#059669] transition-colors shadow-lg shadow-emerald-500/20"
                     >
                       Reveal Answer
                     </button>
@@ -2890,11 +3072,11 @@ export default function DictionaryApp() {
 
                 {/* Back (Meanings) */}
                 <div 
-                  className={`absolute w-full h-full rounded-[3rem] shadow-lg border flex flex-col p-6 md:p-8 overflow-y-auto overflow-x-hidden ${isDarkMode ? 'bg-gradient-to-br from-[#1A1A1A] to-[#111] border-white/10' : 'bg-gradient-to-br from-[#F8FAFC] to-white border-emerald-100'}`}
+                  className={`absolute w-full h-full rounded-[3rem] shadow-lg border flex flex-col p-8 md:p-12 overflow-y-auto overflow-x-hidden ${isDarkMode ? 'bg-gradient-to-br from-[#1A1A1A] to-[#111] border-white/10' : 'bg-gradient-to-br from-[#F8FAFC] to-white border-emerald-100'}`}
                   style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
                 >
-                  <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6">
-                    <div className={`p-5 rounded-2xl border text-center ${isDarkMode ? 'bg-red-500/10 border-red-500/20' : 'bg-red-50 border-red-100'}`}>
+                  <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar space-y-6">
+                    <div className={`p-6 rounded-2xl border text-center ${isDarkMode ? 'bg-red-500/10 border-red-500/20' : 'bg-red-50 border-red-100'}`}>
                       <h4 className={`text-xs font-bold uppercase tracking-widest mb-2 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>Bengali Meaning</h4>
                       <p className={`text-3xl font-bold font-outfit ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>{currentReviewWord.bengaliMeaning}</p>
                     </div>
@@ -2927,6 +3109,15 @@ export default function DictionaryApp() {
                 </div>
               </motion.div>
             </div>
+            
+            <button 
+              onClick={(e) => { e.stopPropagation(); handleNextFlashcard(); }}
+              disabled={reviewQueue.length <= 1}
+              className={`p-3 rounded-full transition-all flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-white/80 hover:bg-white text-slate-800 shadow-md'}`}
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
+          </div>
             
             {reviewMode === 'back' && (
               <motion.div 
@@ -3010,7 +3201,7 @@ export default function DictionaryApp() {
             </h2>
             <div className="flex items-center gap-3">
               <button 
-                onClick={() => setShowSrsSettings(true)}
+                onClick={() => setShowSettings(true)}
                 className={`p-2 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 text-gray-400 hover:bg-white/5 hover:text-white' : 'border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
                 title="Settings"
               >
@@ -3043,7 +3234,7 @@ export default function DictionaryApp() {
                   {userStats.todayReviews} / {userStats.dailyGoal} words
                 </span>
                 <button 
-                  onClick={() => setShowSrsSettings(true)}
+                  onClick={() => setShowSettings(true)}
                   className={`p-1.5 rounded-lg transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
                   title="Settings"
                 >
@@ -3328,14 +3519,16 @@ export default function DictionaryApp() {
                             </div>
                           </div>
                           
-                          <div className="relative flex flex-col gap-2 mt-2">
-                            <input
-                              type="text"
+                          <div className="relative flex flex-col gap-2 mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-white/10">
+                            <label className={`text-[10px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+                              <FileText className="inline w-3 h-3 mr-1" />Notes & Memory Hooks
+                            </label>
+                            <textarea
                               placeholder="Add personal note..."
                               value={word.notes || ''}
                               onChange={(e) => updateSavedWordNotes(word.word, e.target.value)}
                               onClick={(e) => e.stopPropagation()}
-                              className={`w-full text-xs px-3 py-1.5 rounded-lg border outline-none transition-colors ${
+                              className={`w-full text-xs px-3 py-2 rounded-xl border outline-none transition-colors resize-none h-16 ${
                                 isDarkMode 
                                   ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-[#10B981]' 
                                   : 'bg-white border-gray-200 text-slate-800 placeholder:text-slate-400 focus:border-[#10B981]'
@@ -3589,18 +3782,54 @@ export default function DictionaryApp() {
                       <div className={`mt-auto pt-3 border-t border-dashed ${isDarkMode ? 'border-white/10' : 'border-gray-200'}`}>
                         
                         <div className="relative flex flex-col gap-2">
-                          <input
-                            type="text"
+                          <label className={`text-[10px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+                            <FileText className="inline w-3 h-3 mr-1" />Notes & Memory Hooks
+                          </label>
+                          <textarea
                             placeholder="Add personal note..."
                             value={word.notes || ''}
                             onChange={(e) => updateSavedWordNotes(word.word, e.target.value)}
                             onClick={(e) => e.stopPropagation()}
-                            className={`w-full text-xs px-3 py-1.5 rounded-lg border outline-none transition-colors ${
+                            className={`w-full text-xs px-3 py-2 rounded-xl border outline-none transition-colors resize-none h-16 ${
                               isDarkMode 
                                 ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-[#10B981]' 
                                 : 'bg-gray-50 border-gray-200 text-slate-800 placeholder:text-slate-400 focus:border-[#10B981]'
                             }`}
                           />
+                          <div className="flex flex-col gap-2 mt-2">
+                            {word.tags && word.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {word.tags.map(tag => (
+                                  <span key={tag} className={`text-[10px] font-bold flex items-center gap-1 px-2 py-0.5 rounded-full ${isDarkMode ? 'bg-indigo-900/30 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+                                    {tag}
+                                    <button 
+                                      onClick={(e) => { e.stopPropagation(); removeSavedWordTag(word.word, tag); }} 
+                                      className="hover:text-red-500 ml-0.5"
+                                    >
+                                      <X className="w-2.5 h-2.5" />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            <input
+                              type="text"
+                              placeholder="Add tag and press Enter"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  addSavedWordTag(word.word, e.currentTarget.value);
+                                  e.currentTarget.value = '';
+                                }
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className={`w-full text-xs px-3 py-1.5 rounded-lg border outline-none transition-colors ${
+                                isDarkMode 
+                                  ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-indigo-500' 
+                                  : 'bg-gray-50 border-gray-200 text-slate-800 placeholder:text-slate-400 focus:border-indigo-500'
+                              }`}
+                            />
+                          </div>
                           {word.customExamples && word.customExamples.length > 0 && (
                             <div className="flex flex-col gap-1 mt-1">
                               {word.customExamples.map((ex, exIdx) => (
@@ -3888,6 +4117,7 @@ export default function DictionaryApp() {
               </div>
               <input 
                 type="text"
+                autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => {
                   isTypingRef.current = true;
@@ -3964,8 +4194,10 @@ export default function DictionaryApp() {
                     </div>
                   )}
                   {suggestions.map((sug, idx) => (
-                    <div 
+                    <motion.div 
                       key={idx}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleSearch(undefined, sug.word)}
                       className={`px-6 py-4 cursor-pointer flex flex-col gap-1 transition-colors ${idx === selectedSuggestionIndex ? (isDarkMode ? 'bg-white/10' : 'bg-[#D1F4E6]/50') : ''} ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-[#F0FDF8] text-slate-700'}`}
                     >
@@ -3977,13 +4209,18 @@ export default function DictionaryApp() {
                             {sug.category}
                           </span>
                         )}
+                        {sug.isSaved && (
+                          <span className={`text-[10px] flex items-center gap-1 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ${isDarkMode ? 'bg-emerald-900/30 text-emerald-400' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+                            <Bookmark className="w-3 h-3" /> Saved
+                          </span>
+                        )}
                       </div>
                       {sug.definition && (
                         <span className={`text-sm pl-7 line-clamp-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                           {sug.definition}
                         </span>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
                 </motion.div>
               )}
@@ -4272,8 +4509,10 @@ export default function DictionaryApp() {
       {/* Result / Word of the Day Section */}
       {result && !loading && (
         <motion.div 
+          key={result.word}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}
           className="w-full max-w-2xl mx-auto px-4 py-8"
         >
           {/* Search Bar (Top when result is shown) */}
@@ -4304,6 +4543,7 @@ export default function DictionaryApp() {
               </div>
               <input 
                 type="text"
+                autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => {
                   isTypingRef.current = true;
@@ -4371,8 +4611,10 @@ export default function DictionaryApp() {
                     </div>
                   )}
                   {suggestions.map((sug, idx) => (
-                    <div 
+                    <motion.div 
                       key={idx}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleSearch(undefined, sug.word)}
                       className={`px-6 py-4 cursor-pointer flex flex-col gap-1 transition-colors ${idx === selectedSuggestionIndex ? (isDarkMode ? 'bg-white/10' : 'bg-[#D1F4E6]/50') : ''} ${isDarkMode ? 'hover:bg-white/5 text-gray-200' : 'hover:bg-[#F0FDF8] text-slate-700'}`}
                     >
@@ -4384,13 +4626,18 @@ export default function DictionaryApp() {
                             {sug.category}
                           </span>
                         )}
+                        {sug.isSaved && (
+                          <span className={`text-[10px] flex items-center gap-1 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ${isDarkMode ? 'bg-emerald-900/30 text-emerald-400' : 'bg-[#D1F4E6] text-[#10B981]'}`}>
+                            <Bookmark className="w-3 h-3" /> Saved
+                          </span>
+                        )}
                       </div>
                       {sug.definition && (
                         <span className={`text-sm pl-7 line-clamp-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                           {sug.definition}
                         </span>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
                 </motion.div>
               )}
@@ -4497,9 +4744,19 @@ export default function DictionaryApp() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-5xl font-outfit font-extrabold text-[#10B981] mb-4 text-3d-sm">{result.word}</h3>
-                      <div className={`inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-[#1e293b] border-slate-700 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-600'}`}>
-                        <Volume2 className="w-4 h-4 opacity-70" />
-                        <span className="font-mono text-base font-medium tracking-wide">{result.phonetic}</span>
+                      <div className="flex flex-wrap items-center gap-3 mb-6">
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-[#1e293b] border-slate-700 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-600'}`}>
+                          <Volume2 className="w-4 h-4 opacity-70" />
+                          <span className="font-mono text-base font-medium tracking-wide">{result.phonetic}</span>
+                        </div>
+                        {result.variations && result.variations.length > 0 && (
+                          <div className={`inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-lg border shadow-sm ${isDarkMode ? 'bg-amber-900/20 border-amber-500/20 text-amber-400' : 'bg-amber-50 border-amber-200 text-amber-700'}`}>
+                            <span className="text-xs font-bold uppercase tracking-wider opacity-70">Variations:</span>
+                            {result.variations.map((v, i) => (
+                              <span key={i} className="text-sm font-medium">{v}{i < result.variations!.length - 1 ? ', ' : ''}</span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -4648,6 +4905,47 @@ export default function DictionaryApp() {
                 </div>
               )}
               
+              {/* Visual Flashcard Section */}
+              <div className={`rounded-3xl p-6 mb-8 border transition-colors relative overflow-hidden ${isDarkMode ? 'bg-sky-500/5 border-sky-500/20' : 'bg-sky-50 border-sky-100'}`}>
+                <div className={`absolute -right-4 -top-4 opacity-5 ${isDarkMode ? 'text-sky-500' : 'text-sky-900'}`}>
+                  <ImageIcon className="w-32 h-32" />
+                </div>
+                <h4 className={`text-sm font-bold uppercase tracking-widest mb-4 flex items-center justify-between relative z-10 ${isDarkMode ? 'text-sky-400' : 'text-sky-600'}`}>
+                  <span className="flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" /> AI Flashcard
+                  </span>
+                  {!flashcardImage && !isGeneratingFlashcard && (
+                    <button 
+                      onClick={generateFlashcardImage}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isDarkMode ? 'bg-sky-500/20 text-sky-300 hover:bg-sky-500/40' : 'bg-sky-200 text-sky-800 hover:bg-sky-300'}`}
+                    >
+                      Generate Image
+                    </button>
+                  )}
+                </h4>
+                <div className="relative z-10">
+                  {flashcardImage ? (
+                    <div className="flex flex-col items-center">
+                      <div className={`relative w-full max-w-lg aspect-square rounded-2xl overflow-hidden border-4 shadow-xl ${isDarkMode ? 'border-gray-800' : 'border-white'}`}>
+                        <Image src={flashcardImage} alt={`Flashcard for ${result.word}`} fill className="object-cover" />
+                      </div>
+                      <p className={`mt-4 text-sm italic opacity-80 ${isDarkMode ? 'text-sky-200' : 'text-sky-800'}`}>
+                        A visual representation of &quot;{result.word}&quot;
+                      </p>
+                    </div>
+                  ) : isGeneratingFlashcard ? (
+                    <div className="flex flex-col items-center justify-center py-12 gap-3">
+                      <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
+                      <p className={`text-sm font-medium ${isDarkMode ? 'text-sky-400' : 'text-sky-600'}`}>Painting a masterpiece...</p>
+                    </div>
+                  ) : (
+                    <div className={`py-8 text-center text-sm ${isDarkMode ? 'text-sky-300/70' : 'text-sky-700/70'}`}>
+                      Generate a visual flashcard to help you remember this word!
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Meaning & Definition Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 {/* Bengali Meaning */}
@@ -4735,13 +5033,24 @@ export default function DictionaryApp() {
                             <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
                               &quot;{highlightWord(ex.english, result.word, isDarkMode)}&quot;
                             </p>
-                            <CopyButton text={ex.english} isDarkMode={isDarkMode} />
+                            <div className="flex items-center gap-1">
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); playPronunciation(ex.english); }}
+                                className={`p-1.5 rounded-lg transition-all shrink-0 ${isDarkMode ? 'hover:bg-white/10 text-gray-400 hover:text-emerald-400' : 'hover:bg-gray-100 text-slate-400 hover:text-emerald-600'}`}
+                                title="Play example"
+                              >
+                                <Volume2 className="w-3.5 h-3.5" />
+                              </button>
+                              <CopyButton text={ex.english} isDarkMode={isDarkMode} />
+                            </div>
                           </div>
                           <div className="flex items-center justify-between gap-2">
                             <p className={`text-sm font-medium flex-1 ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-700/80'}`}>
                               {ex.bengali}
                             </p>
-                            <CopyButton text={ex.bengali} isDarkMode={isDarkMode} />
+                            <div className="flex items-center gap-1">
+                              <CopyButton text={ex.bengali} isDarkMode={isDarkMode} />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -4785,7 +5094,16 @@ export default function DictionaryApp() {
                           <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
                             &quot;{highlightWord(ex, result.word, isDarkMode)}&quot;
                           </p>
-                          <CopyButton text={ex} isDarkMode={isDarkMode} />
+                          <div className="flex items-center gap-1">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); playPronunciation(ex); }}
+                              className={`p-1.5 rounded-lg transition-all shrink-0 ${isDarkMode ? 'hover:bg-white/10 text-gray-400 hover:text-emerald-400' : 'hover:bg-gray-100 text-slate-400 hover:text-emerald-600'}`}
+                              title="Play example"
+                            >
+                              <Volume2 className="w-3.5 h-3.5" />
+                            </button>
+                            <CopyButton text={ex} isDarkMode={isDarkMode} />
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -4821,7 +5139,16 @@ export default function DictionaryApp() {
                     <p className={`italic text-lg leading-relaxed flex-1 ${isDarkMode ? 'text-emerald-100' : 'text-emerald-950'}`}>
                       &quot;{highlightWord(result.exampleSentence, result.word, isDarkMode)}&quot;
                     </p>
-                    <CopyButton text={result.exampleSentence} isDarkMode={isDarkMode} />
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); playPronunciation(result.exampleSentence!); }}
+                        className={`p-1.5 rounded-lg transition-all shrink-0 ${isDarkMode ? 'hover:bg-white/10 text-gray-400 hover:text-emerald-400' : 'hover:bg-gray-100 text-slate-400 hover:text-emerald-600'}`}
+                        title="Play example"
+                      >
+                        <Volume2 className="w-3.5 h-3.5" />
+                      </button>
+                      <CopyButton text={result.exampleSentence} isDarkMode={isDarkMode} />
+                    </div>
                   </div>
                 </div>
               ) : null}
@@ -5370,7 +5697,7 @@ export default function DictionaryApp() {
 
       {/* SRS Settings Modal */}
       <AnimatePresence>
-        {showSrsSettings && (
+        {showSettings && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -5386,7 +5713,7 @@ export default function DictionaryApp() {
               <div className="flex justify-between items-center mb-6">
                 <h3 className={`text-2xl font-outfit font-bold ${isDarkMode ? 'text-white' : 'text-[#1E293B]'}`}>Settings</h3>
                 <button 
-                  onClick={() => setShowSrsSettings(false)}
+                  onClick={() => setShowSettings(false)}
                   className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
                 >
                   <X className="w-5 h-5" />
@@ -5660,7 +5987,7 @@ export default function DictionaryApp() {
               </div>
 
               <button 
-                onClick={() => setShowSrsSettings(false)}
+                onClick={() => setShowSettings(false)}
                 className="w-full mt-8 bg-[#10B981] text-white py-4 rounded-xl font-bold hover:bg-[#059669] transition-colors"
               >
                 Save Settings
