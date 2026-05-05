@@ -2055,7 +2055,7 @@ When generating the 5 example sentences in the 'examples' array, you MUST priori
       }
     } catch (error) {
       console.error("AI Image Generation failed:", error);
-      alert("Network or AI service error while generating image.");
+      alert(`Image generation failed: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsGeneratingFlashcard(false);
     }
