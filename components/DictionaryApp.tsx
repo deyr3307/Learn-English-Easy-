@@ -4905,46 +4905,7 @@ When generating the 5 example sentences in the 'examples' array, you MUST priori
                 </div>
               )}
               
-              {/* Visual Flashcard Section */}
-              <div className={`rounded-3xl p-6 mb-8 border transition-colors relative overflow-hidden ${isDarkMode ? 'bg-sky-500/5 border-sky-500/20' : 'bg-sky-50 border-sky-100'}`}>
-                <div className={`absolute -right-4 -top-4 opacity-5 ${isDarkMode ? 'text-sky-500' : 'text-sky-900'}`}>
-                  <ImageIcon className="w-32 h-32" />
-                </div>
-                <h4 className={`text-sm font-bold uppercase tracking-widest mb-4 flex items-center justify-between relative z-10 ${isDarkMode ? 'text-sky-400' : 'text-sky-600'}`}>
-                  <span className="flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" /> AI Flashcard
-                  </span>
-                  {!flashcardImage && !isGeneratingFlashcard && (
-                    <button 
-                      onClick={() => generateFlashcardImage()}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isDarkMode ? 'bg-sky-500/20 text-sky-300 hover:bg-sky-500/40' : 'bg-sky-200 text-sky-800 hover:bg-sky-300'}`}
-                    >
-                      Generate Image
-                    </button>
-                  )}
-                </h4>
-                <div className="relative z-10">
-                  {flashcardImage ? (
-                    <div className="flex flex-col items-center">
-                      <div className={`relative w-full max-w-lg aspect-square rounded-2xl overflow-hidden border-4 shadow-xl ${isDarkMode ? 'border-gray-800' : 'border-white'}`}>
-                        <Image src={flashcardImage} alt={`Flashcard for ${result.word}`} fill className="object-cover" />
-                      </div>
-                      <p className={`mt-4 text-sm italic opacity-80 ${isDarkMode ? 'text-sky-200' : 'text-sky-800'}`}>
-                        A visual representation of &quot;{result.word}&quot;
-                      </p>
-                    </div>
-                  ) : isGeneratingFlashcard ? (
-                    <div className="flex flex-col items-center justify-center py-12 gap-3">
-                      <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
-                      <p className={`text-sm font-medium ${isDarkMode ? 'text-sky-400' : 'text-sky-600'}`}>Painting a masterpiece...</p>
-                    </div>
-                  ) : (
-                    <div className={`py-8 text-center text-sm ${isDarkMode ? 'text-sky-300/70' : 'text-sky-700/70'}`}>
-                      Generate a visual flashcard to help you remember this word!
-                    </div>
-                  )}
-                </div>
-              </div>
+          
 
               {/* Meaning & Definition Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
