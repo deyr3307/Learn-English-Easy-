@@ -9,9 +9,11 @@ const luckiestGuy = Luckiest_Guy({
 });
 
 export const metadata: Metadata = {
-  title: 'Learn English Easy',
-  description: 'Search any word — get Bengali meaning, pronunciation, examples, tips & more.',
+  title: 'Learn English Easy - English to Bengali Dictionary',
+  description: 'Search any English word to get accurate Bengali meaning, pronunciation, examples, and tips. 100% free web app.',
 };
+
+
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
