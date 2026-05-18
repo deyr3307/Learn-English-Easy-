@@ -1,0 +1,15 @@
+{
+  "name": "Learn English Easy",
+  "short_name": "English Easy",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8fbf3",
+  "theme_color": "#2b5f4c",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}
